@@ -6,6 +6,7 @@ class Project {
   constructor(name) {
     this.name = name;
     this.color = this.#generateRandomColor();
+    this.id = crypto.randomUUID();
   }
 
   #generateRandomColor() {
@@ -17,14 +18,28 @@ class Project {
 
   #handleClick() {
     console.log(`Project: ${this.name}`);
+    ProjectsManager.toggleProjectsDisplay();
+  }
+
+  #handleDelete() {
+    const projectDiv = document.querySelector(`[data-project-id='${this.id}']`);
+    projectDiv.remove();
   }
 
   getElement () {
     const div = document.createElement("div");
     div.classList.add("project-item");
     div.setAttribute("title", this.name)
+    div.dataset.projectId = this.id
+    div.addEventListener("click", (e) => this.#handleClick());
 
-    div.addEventListener("click", () => this.#handleClick());
+    const deleteDiv = document.createElement("div");
+    deleteDiv.classList.add("delete-btn");
+    deleteDiv.textContent = "X";
+    deleteDiv.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.#handleDelete()
+    });
 
     const colorDiv = document.createElement("div");
     colorDiv.style.backgroundColor = this.color;
@@ -32,7 +47,7 @@ class Project {
     const h2 = document.createElement("h2");
     h2.textContent = this.name;
 
-    div.append(colorDiv, h2);
+    div.append(deleteDiv, colorDiv, h2);
 
     return div;
   }
@@ -44,11 +59,20 @@ const DialogManager = (function() {
   const addProjectFormInput = document.querySelector(".add-project-dialog form input");
 
   const toggleDialogDisplay = () => {
-    if (addProjectDialog.style.display !== "flex") {
-      addProjectDialog.style.display = "flex"
-    } else {
-      addProjectDialog.style.display = "none";
-    }
+    addProjectDialog.classList.toggle("none-display");
+  }
+
+  const renderProject = () => {
+    const project = new Project(addProjectFormInput.value);
+    // ProjectsManager.projects[project.id] = {
+    //   name: project.name,
+    //   color: project.color,
+    // }
+    // localStorage.setItem("projects", JSON.stringify(ProjectsManager.projects));
+
+    ProjectsManager.getProjectsDiv().insertBefore(project.getElement(), ProjectsManager.getAddProjectDiv());
+    toggleDialogDisplay();
+    addProjectFormInput.value = "";
   }
 
   addProjectDialog.addEventListener("click", (e) => {
@@ -59,11 +83,12 @@ const DialogManager = (function() {
 
   addProjectFormButton.addEventListener("click", (e) => {
     e.preventDefault();
+    let i = 0;
     if (addProjectFormInput.value !== "") {
-      const project = new Project(addProjectFormInput.value);
-      ProjectsManager.getBoard().insertBefore(project.getElement(), ProjectsManager.getAddProjectDiv());
-      addProjectDialog.style.display = "none";
-      addProjectFormInput.value = "";
+      // while (i < 30) {
+      renderProject();
+      //   i++;
+      // }
     }
   })
 
@@ -71,16 +96,28 @@ const DialogManager = (function() {
 })();
 
 const ProjectsManager = (function() {
-  const board = document.querySelector(".board");
+  const projects = {};
+
+  const projectsShortcut = document.querySelector(".header > a");
+  const projectsDiv = document.querySelector(".projects");
+  const projectDiv = document.querySelector(".project");
   const addProjectDiv = document.querySelector(".add-project");
+
+  const toggleProjectsDisplay = () => {
+    projectsDiv.classList.toggle("none-display");
+  }
+
+  projectsShortcut.addEventListener("click", (e) => {
+    e.preventDefault();
+    projectsDiv.classList.remove("none-display");
+  });
   
   addProjectDiv.addEventListener("click", () => {
     DialogManager.toggleDialogDisplay();
   });
 
-  const getBoard = () => board;
+  const getProjectsDiv = () => projectsDiv;
   const getAddProjectDiv = () => addProjectDiv;
 
-  return { getBoard, getAddProjectDiv };
+  return { getProjectsDiv, getAddProjectDiv, toggleProjectsDisplay, projects };
 })();
-
