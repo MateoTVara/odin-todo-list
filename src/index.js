@@ -22,6 +22,7 @@ class Project {
   }
 
   #handleDelete() {
+    ProjectsManager.remove(this.id);
     const projectDiv = document.querySelector(`[data-project-id='${this.id}']`);
     projectDiv.remove();
   }
@@ -64,12 +65,11 @@ const DialogManager = (function() {
 
   const renderProject = () => {
     const project = new Project(addProjectFormInput.value);
-    // ProjectsManager.projects[project.id] = {
-    //   name: project.name,
-    //   color: project.color,
-    // }
-    // localStorage.setItem("projects", JSON.stringify(ProjectsManager.projects));
-
+    ProjectsManager.add({
+      id: project.id,
+      name: project.name,
+      color: project.color
+    });
     ProjectsManager.getProjectsDiv().insertBefore(project.getElement(), ProjectsManager.getAddProjectDiv());
     toggleDialogDisplay();
     addProjectFormInput.value = "";
@@ -83,20 +83,19 @@ const DialogManager = (function() {
 
   addProjectFormButton.addEventListener("click", (e) => {
     e.preventDefault();
-    let i = 0;
-    if (addProjectFormInput.value !== "") {
-      // while (i < 30) {
-      renderProject();
-      //   i++;
-      // }
-    }
+    if (addProjectFormInput.value !== "") {renderProject();}
   })
 
   return { toggleDialogDisplay };
 })();
 
 const ProjectsManager = (function() {
-  const projects = {};
+  const PROJECTS_STORAGE_KEY = "projects";
+
+  const projects = (function() {
+    const raw = localStorage.getItem(PROJECTS_STORAGE_KEY);
+    return raw ? JSON.parse(raw): {};
+  })();
 
   const projectsShortcut = document.querySelector(".header > a");
   const projectsDiv = document.querySelector(".projects");
@@ -105,6 +104,36 @@ const ProjectsManager = (function() {
 
   const toggleProjectsDisplay = () => {
     projectsDiv.classList.toggle("none-display");
+  }
+
+  const save = () => {
+    localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
+  }
+
+  const add = (projectData) => {
+    projects[projectData.id] = {
+      name: projectData.name,
+      color: projectData.color
+    };
+    save();
+  }
+
+  const remove = (projectId) => {
+    if (projects[projectId]){
+      delete projects[projectId];
+      save();
+    }
+  }
+
+  const renderAllProjects = () => {
+    projectsDiv.querySelectorAll(".project-item").forEach(element => element.remove());
+    Object.keys(projects).forEach(persistedProjectId => {
+      const persistedProjectData = projects[persistedProjectId];
+      const project = new Project(persistedProjectData.name);
+      project.id = persistedProjectId;
+      project.color = persistedProjectData.color;
+      projectsDiv.insertBefore(project.getElement(), addProjectDiv);
+    })
   }
 
   projectsShortcut.addEventListener("click", (e) => {
@@ -119,5 +148,14 @@ const ProjectsManager = (function() {
   const getProjectsDiv = () => projectsDiv;
   const getAddProjectDiv = () => addProjectDiv;
 
-  return { getProjectsDiv, getAddProjectDiv, toggleProjectsDisplay, projects };
+  renderAllProjects();
+
+  return { 
+    getProjectsDiv,
+    getAddProjectDiv,
+    toggleProjectsDisplay,
+    add,
+    remove,
+    projects, 
+  };
 })();
