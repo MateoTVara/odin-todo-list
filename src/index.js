@@ -1,6 +1,9 @@
 // index.js
 
+import { createSwapy } from 'swapy';
 import "./styles.css";
+
+let isDragging = false;
 
 class Project {
   constructor(name) {
@@ -17,22 +20,28 @@ class Project {
   }
 
   #handleClick() {
+    if (isDragging) return;
     console.log(`Project: ${this.name}`);
     ProjectsManager.toggleProjectsDisplay();
   }
 
   #handleDelete() {
     ProjectsManager.remove(this.id);
-    const projectDiv = document.querySelector(`[data-project-id='${this.id}']`);
-    projectDiv.remove();
+    const element = document.querySelector(`[data-project-id="${this.id}"]`).parentElement;
+    element.remove();
   }
 
   getElement () {
+    const slotDiv = document.createElement("div");
+    slotDiv.dataset.swapySlot = this.id;
+    
     const div = document.createElement("div");
     div.classList.add("project-item");
-    div.setAttribute("title", this.name)
-    div.dataset.projectId = this.id
-    div.addEventListener("click", (e) => this.#handleClick());
+    div.setAttribute("title", this.name);
+    div.dataset.projectId = this.id;
+    div.dataset.swapyItem = this.id;
+
+    div.addEventListener("click", () => this.#handleClick());
 
     const deleteDiv = document.createElement("div");
     deleteDiv.classList.add("delete-btn");
@@ -42,15 +51,21 @@ class Project {
       this.#handleDelete()
     });
 
+    const handleDiv = document.createElement("div");
+    handleDiv.classList.add("handle");
+    handleDiv.dataset.swapyHandle = "";
+
     const colorDiv = document.createElement("div");
     colorDiv.style.backgroundColor = this.color;
 
     const h2 = document.createElement("h2");
     h2.textContent = this.name;
 
-    div.append(deleteDiv, colorDiv, h2);
-
-    return div;
+    div.append(deleteDiv, handleDiv, colorDiv, h2);
+    
+    slotDiv.appendChild(div);
+    
+    return slotDiv;
   }
 }
 
@@ -71,6 +86,7 @@ const DialogManager = (function() {
       color: project.color
     });
     ProjectsManager.getProjectsDiv().insertBefore(project.getElement(), ProjectsManager.getAddProjectDiv());
+    SwapyManager.swapy.update();
     toggleDialogDisplay();
     addProjectFormInput.value = "";
   }
@@ -91,10 +107,16 @@ const DialogManager = (function() {
 
 const ProjectsManager = (function() {
   const PROJECTS_STORAGE_KEY = "projects";
+  const ORDER_STORAGE_KEY = "projects-order";
 
   const projects = (function() {
     const raw = localStorage.getItem(PROJECTS_STORAGE_KEY);
     return raw ? JSON.parse(raw): {};
+  })();
+
+  const projectsOrder = (function() {
+    const raw = localStorage.getItem(ORDER_STORAGE_KEY);
+    return raw ? JSON.parse(raw): [];
   })();
 
   const projectsShortcut = document.querySelector(".header > a");
@@ -108,6 +130,7 @@ const ProjectsManager = (function() {
 
   const save = () => {
     localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
+    localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(projectsOrder))
   }
 
   const add = (projectData) => {
@@ -115,19 +138,28 @@ const ProjectsManager = (function() {
       name: projectData.name,
       color: projectData.color
     };
+    projectsOrder.push(projectData.id);
     save();
   }
 
   const remove = (projectId) => {
     if (projects[projectId]){
       delete projects[projectId];
+      const index = projectsOrder.indexOf(projectId);
+      projectsOrder.splice(index, 1);
       save();
     }
   }
 
+  const updateOrder = (newOrder) => {
+    projectsOrder.length = 0;
+    projectsOrder.push(...newOrder);
+    save();
+  }
+
   const renderAllProjects = () => {
     projectsDiv.querySelectorAll(".project-item").forEach(element => element.remove());
-    Object.keys(projects).forEach(persistedProjectId => {
+    projectsOrder.forEach(persistedProjectId => {
       const persistedProjectData = projects[persistedProjectId];
       const project = new Project(persistedProjectData.name);
       project.id = persistedProjectId;
@@ -156,6 +188,31 @@ const ProjectsManager = (function() {
     toggleProjectsDisplay,
     add,
     remove,
+    updateOrder,
     projects, 
   };
+})();
+
+const SwapyManager = (function(){
+  const swapy = createSwapy(ProjectsManager.getProjectsDiv(), {
+    animation: 'dynamic',
+    autoScrollOnDrag: true,
+  })
+
+  swapy.onSwapStart(() => {
+    isDragging = true;
+    console.log(`Drag started ${isDragging}`);
+  });
+
+  swapy.onSwapEnd(() => {
+    const newOrder = Array.from(ProjectsManager.getProjectsDiv().querySelectorAll("[data-project-id]")).map(e => e.dataset.projectId);
+    ProjectsManager.updateOrder(newOrder);
+
+    setTimeout(() => {
+      isDragging = false;
+      console.log(`Drag ended ${isDragging}`);
+    }, 50);
+  });
+
+  return { swapy };
 })();

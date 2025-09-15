@@ -7,6 +7,10 @@ settings:
 importers:
 
   .:
+    dependencies:
+      swapy:
+        specifier: ^1.0.5
+        version: 1.0.5
     devDependencies:
       css-loader:
         specifier: ^7.1.2
@@ -1280,6 +1284,9 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  swapy@1.0.5:
+    resolution: {integrity: sha512-XEzy5HCw7yESb7QajKTBJ+NA/BL0kAKlE7XhSMPZawF740X4ws/5CFtXRsVDQ+EztISC759a9+DJM9mxjz4hXg==}
 
   tapable@2.2.3:
     resolution: {integrity: sha512-ZL6DDuAlRlLGghwcfmSn9sK3Hr6ArtyudlSAiCqQ6IfE+b+HHbydbYDIG15IfS5do+7XQQBdBiubF/cV2dnDzg==}
@@ -2754,6 +2761,8 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  swapy@1.0.5: {}
 
   tapable@2.2.3: {}
 
