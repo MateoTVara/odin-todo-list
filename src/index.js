@@ -61,7 +61,9 @@ class Project {
     const h2 = document.createElement("h2");
     h2.textContent = this.name;
 
-    div.append(deleteDiv, handleDiv, colorDiv, h2);
+    colorDiv.append(handleDiv, deleteDiv);
+
+    div.append(colorDiv, h2);
     
     slotDiv.appendChild(div);
     

@@ -83,6 +83,8 @@ body {
   text-align: center;
   align-content: center;
   background-color: rgb(240, 240, 240);
+  border-radius: 24px;
+  border: none;
 }
 
 div[data-swapy-slot] > .project-item {
@@ -96,10 +98,14 @@ div[data-swapy-slot] > .project-item {
   align-items: center;
 }
 
-.project-item > .delete-btn {
-  position: absolute;
-  top: 0px;
-  right: 0px;
+.project-item > div {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  justify-content: space-between;
+}
+
+.project-item .delete-btn {
   background-color: rgb(240, 240, 240, 0.5);
   width: 24px;
   height: 24px;
@@ -109,15 +115,12 @@ div[data-swapy-slot] > .project-item {
   text-align: center;
 }
 
-.project-item > .handle {
+.project-item .handle {
   background-image: url(assets/icons/handle.svg);
   background-size: 24px 24px;
   background-repeat: no-repeat;
   background-position: center;
   background-color: rgb(240, 240, 240, 0.5);
-  position: absolute;
-  top: 0px;
-  left: 0px;
   width: 24px;
   height: 24px;
   cursor: grab;
