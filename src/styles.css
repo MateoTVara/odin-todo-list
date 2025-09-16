@@ -60,6 +60,10 @@ body {
   text-decoration: none;
 }
 
+.header > a:visited{
+  color: rgb(0, 0, 0);
+}
+
 
 
 /* Projects */
@@ -121,6 +125,7 @@ div[data-swapy-slot] > .project-item {
   cursor: pointer;
   line-height: 1;
   text-align: center;
+  align-content: center;
 }
 
 .project-item .handle {
@@ -148,6 +153,7 @@ div[data-swapy-slot] > .project-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  background-color: rgb(255, 255, 255);
 }
 
 .board > .project {
