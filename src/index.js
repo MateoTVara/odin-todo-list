@@ -1,6 +1,7 @@
 // index.js
 
 import { createSwapy } from 'swapy';
+import { ProjectManager } from './modules/project';
 import "./styles.css";
 
 let isDragging = false;
@@ -23,6 +24,7 @@ class Project {
     if (isDragging) return;
     console.log(`Project: ${this.name}`);
     ProjectsManager.toggleProjectsDisplay();
+    ProjectsManager.toggleProjectDisplay();
   }
 
   #handleDelete() {
@@ -130,6 +132,10 @@ const ProjectsManager = (function() {
     projectsDiv.classList.toggle("none-display");
   }
 
+  const toggleProjectDisplay = () => {
+    projectDiv.classList.toggle("none-display");
+  }
+
   const save = () => {
     localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
     localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(projectsOrder))
@@ -172,6 +178,7 @@ const ProjectsManager = (function() {
 
   projectsShortcut.addEventListener("click", (e) => {
     e.preventDefault();
+    projectDiv.classList.add("none-display");
     projectsDiv.classList.remove("none-display");
   });
   
@@ -183,11 +190,13 @@ const ProjectsManager = (function() {
   const getAddProjectDiv = () => addProjectDiv;
 
   renderAllProjects();
+  ProjectManager.attachAddListListener();
 
   return { 
     getProjectsDiv,
     getAddProjectDiv,
     toggleProjectsDisplay,
+    toggleProjectDisplay,
     add,
     remove,
     updateOrder,
