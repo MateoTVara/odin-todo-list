@@ -88,6 +88,11 @@ body {
   background-color: rgb(240, 240, 240);
   border-radius: 24px;
   border: none;
+  cursor: pointer;
+}
+
+.projects > .add-project:hover {
+  background-color: rgb(220, 220, 220);
 }
 
 div[data-swapy-slot] > .project-item {
@@ -171,28 +176,62 @@ div[data-swapy-slot] > .project-item {
   gap: 8px;
 }
 
+.project > [data-swapy-slot] > .list-item > .list-header {
+  padding: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.project .list-header .delete-btn {
+  width: 24px;
+  height: 24px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.project .add-list:hover {
+  background-color: rgb(220, 220, 220);
+  cursor: pointer;
+}
+
 .project .title {
+  flex: 1;
+
+  min-width: 0;
+  padding: 4px 8px;
   border: none;
+  cursor: pointer;
 }
 
 .project .title:focus {
-  outline-style: none;
-  border: 1px solid black;
+  outline: 1px solid black;
 }
 
 .project .card-item {
   border: none;
+  width: 100%;
+  padding: 4px 8px;
 }
 
 .project .card-item:focus {
   outline-style: none;
-  border: 1px solid blue
+  outline: 1px solid black;
 }
 
 .project .card-item:disabled {
   border: none;
   outline-style: none;
   color: black;
+}
+
+.project .add-card {
+  padding: 4px 8px;
+}
+
+.project .add-card:hover {
+  background-color: rgb(220, 220, 220);
+  cursor: pointer;
 }
 
 

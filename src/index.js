@@ -1,7 +1,7 @@
 // index.js
 
 import { createSwapy } from 'swapy';
-import { ProjectManager } from './modules/project';
+import { List, Card } from './modules/project';
 import "./styles.css";
 
 let isDragging = false;
@@ -11,6 +11,7 @@ class Project {
     this.name = name;
     this.color = this.#generateRandomColor();
     this.id = crypto.randomUUID();
+    this.lists = [];
   }
 
   #generateRandomColor() {
@@ -25,6 +26,8 @@ class Project {
     console.log(`Project: ${this.name}`);
     ProjectsManager.toggleProjectsDisplay();
     ProjectsManager.toggleProjectDisplay();
+    ProjectsManager.setProjectDivDatasetProjectId(this.id);
+    ProjectManager.renderAllProjectLists()
   }
 
   #handleDelete() {
@@ -87,13 +90,16 @@ const DialogManager = (function() {
     ProjectsManager.add({
       id: project.id,
       name: project.name,
-      color: project.color
+      color: project.color,
+      lists: project.lists
     });
     ProjectsManager.getProjectsDiv().insertBefore(project.getElement(), ProjectsManager.getAddProjectDiv());
     SwapyManager.swapy.update();
     toggleDialogDisplay();
     addProjectFormInput.value = "";
   }
+
+  const getProjectNameInput = () => {return addProjectFormInput};
 
   addProjectDialog.addEventListener("click", (e) => {
     if (e.target === addProjectDialog) {
@@ -106,7 +112,7 @@ const DialogManager = (function() {
     if (addProjectFormInput.value !== "") {renderProject();}
   })
 
-  return { toggleDialogDisplay };
+  return { toggleDialogDisplay, getProjectNameInput };
 })();
 
 const ProjectsManager = (function() {
@@ -136,16 +142,60 @@ const ProjectsManager = (function() {
     projectDiv.classList.toggle("none-display");
   }
 
+  const setProjectDivDatasetProjectId = (projectId) => {
+    projectDiv.dataset.projectId = projectId;
+  }
+
+  const removeProjectDivDatasetProjectId = () => {
+    delete projectDiv.dataset.projectId;
+  }
+
+  const getCard = (cardData) => {
+    const card = new Card(cardData.description);
+    card.id = cardData.id;
+
+    return card;
+  }
+
+  const getList = (listData) => {
+    const list = new List(listData.title);
+    list.id = listData.id;
+    list.cards = listData.cards.map(card => getCard(card));
+
+    return list;
+  }
+
+  const getCurrentProjectInstance = (projectId) => {
+    const projectData = projects[projectId];
+    const project = new Project(projectData.name);
+    project.id = projectId;
+    project.color = projectData.color;
+    project.lists = projectData.lists.map(list => getList(list));
+    return project;
+  }
+
+  const serializeProject = (projectData) => {
+    return {
+      name: projectData.name,
+      color: projectData.color,
+      lists: projectData.lists.map(list => ({
+        id: list.id,
+        title: list.title,
+        cards: list.cards.map(card => ({
+          id: card.id,
+          description: card.description
+        }))
+      }))
+    }
+  }
+
   const save = () => {
     localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
     localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(projectsOrder))
   }
 
   const add = (projectData) => {
-    projects[projectData.id] = {
-      name: projectData.name,
-      color: projectData.color
-    };
+    projects[projectData.id] = serializeProject(projectData);
     projectsOrder.push(projectData.id);
     save();
   }
@@ -159,6 +209,11 @@ const ProjectsManager = (function() {
     }
   }
 
+  const update = (projectData) => {
+    projects[projectData.id] = serializeProject(projectData);
+    save();
+  }
+
   const updateOrder = (newOrder) => {
     projectsOrder.length = 0;
     projectsOrder.push(...newOrder);
@@ -168,10 +223,7 @@ const ProjectsManager = (function() {
   const renderAllProjects = () => {
     projectsDiv.querySelectorAll(".project-item").forEach(element => element.remove());
     projectsOrder.forEach(persistedProjectId => {
-      const persistedProjectData = projects[persistedProjectId];
-      const project = new Project(persistedProjectData.name);
-      project.id = persistedProjectId;
-      project.color = persistedProjectData.color;
+      const project = getCurrentProjectInstance(persistedProjectId);
       projectsDiv.insertBefore(project.getElement(), addProjectDiv);
     })
   }
@@ -180,29 +232,76 @@ const ProjectsManager = (function() {
     e.preventDefault();
     projectDiv.classList.add("none-display");
     projectsDiv.classList.remove("none-display");
+    ProjectManager.clearListsDivs();
+    removeProjectDivDatasetProjectId();
   });
   
   addProjectDiv.addEventListener("click", () => {
     DialogManager.toggleDialogDisplay();
+    DialogManager.getProjectNameInput().focus();
   });
 
   const getProjectsDiv = () => projectsDiv;
   const getAddProjectDiv = () => addProjectDiv;
 
   renderAllProjects();
-  ProjectManager.attachAddListListener();
 
   return { 
     getProjectsDiv,
     getAddProjectDiv,
     toggleProjectsDisplay,
     toggleProjectDisplay,
+    setProjectDivDatasetProjectId,
+    getCurrentProjectInstance,
     add,
     remove,
+    update,
     updateOrder,
     projects, 
   };
 })();
+
+const ProjectManager = (function () {
+  const projectDiv = document.querySelector(".project");
+  const addListDiv = document.querySelector(".add-list");
+
+  const getProjectDiv = () => {return projectDiv};
+
+  const renderList = (list) => {
+    const el = list.getElement();
+    projectDiv.insertBefore(el, addListDiv);
+    return el;
+  }
+
+  const renderAllProjectLists = () => {
+    const currentProject = ProjectsManager.getCurrentProjectInstance(projectDiv.dataset.projectId);
+    currentProject.lists.forEach(list => {
+      renderList(list);
+    });
+  }
+
+  const clearListsDivs = () => {
+    document.querySelectorAll(".list-item").forEach(listDiv => listDiv.parentElement.remove())
+  }
+
+  addListDiv.addEventListener("click", () => {
+    const currentProject = ProjectsManager.getCurrentProjectInstance(projectDiv.dataset.projectId);
+    const list = new List();
+    console.log("Add list clicked");
+    console.log("Current project:", currentProject.name);
+    currentProject.lists.push(list);
+    console.log(currentProject.lists);
+    ProjectsManager.update(currentProject);
+
+    const listElement = renderList(list);
+    const listTitle = listElement.querySelector(".title");
+    listTitle.focus();
+  });
+
+  return { renderAllProjectLists, clearListsDivs, getProjectDiv }
+})();
+
+
 
 const SwapyManager = (function(){
   const swapy = createSwapy(ProjectsManager.getProjectsDiv(), {
@@ -227,3 +326,5 @@ const SwapyManager = (function(){
 
   return { swapy };
 })();
+
+export { ProjectsManager, ProjectManager };

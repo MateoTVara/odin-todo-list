@@ -1,24 +1,6 @@
 // project.js
 
-const projectDiv = document.querySelector(".project");
-const addListDiv = document.querySelector(".add-list");
-
-export const ProjectManager = (function () {
-  const attachAddListListener = () => {
-    addListDiv.addEventListener("click", () => {
-      const list = new List();
-      const el = list.getElement();
-      console.log("Add list clicked");
-      projectDiv.insertBefore(el, addListDiv);
-      const input = el.querySelector("input");
-      input.focus();
-    });
-  }
-
-  return {
-    attachAddListListener,
-  }
-})();
+import { ProjectsManager, ProjectManager } from "../index";
 
 class List {
   constructor(title="New List") {
@@ -37,6 +19,18 @@ class List {
     div.dataset.listId = this.id;
     div.dataset.swapyItem = this.id;
 
+    const header = document.createElement("div");
+    header.classList.add("list-header");
+
+    const deleteDiv = document.createElement("div");
+    deleteDiv.classList.add("delete-btn");
+    deleteDiv.textContent = "X";
+    deleteDiv.addEventListener("click", () => {
+      this.cards = [];
+      const element = document.querySelector(`[data-list-id="${this.id}"]`).parentElement;
+      element.remove();
+    });
+
     const title = document.createElement("input");
     title.classList.add("title")
     title.value = this.title;
@@ -52,9 +46,17 @@ class List {
       } else {
         this.title = title.value;
       }
-      console.log(this.title);
+      console.log(`List ${this.id} title updated to: ${this.title}`);
+      title.scrollLeft = 0;
+      div.setAttribute("title", this.title);
+      const projectId = ProjectManager.getProjectDiv().dataset.projectId;
+      const projectData = ProjectsManager.getCurrentProjectInstance(projectId);
+      projectData.lists.forEach(list => {if (list.id === this.id) list.title = this.title})
+      ProjectsManager.update(projectData);
     })
     title.focus();
+
+    header.append(title, deleteDiv);
 
     const addCardDiv = document.createElement("div");
     addCardDiv.classList.add("add-card");
@@ -67,9 +69,10 @@ class List {
       div.insertBefore(el, addCardDiv);
       const input = el.querySelector("input");
       input.focus();
+      console.log(this.cards);
     })
 
-    div.append(title, addCardDiv);
+    div.append(header, addCardDiv);
     
     slotDiv.appendChild(div);
 
@@ -100,9 +103,18 @@ class Card {
         this.description = description.value;
       }
       console.log(this.description);
+      description.scrollLeft = 0;
     });
+    description.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        description.blur();
+      }
+    })
 
     slotDiv.appendChild(description);
     return slotDiv;
   }
 }
+
+export { List, Card };
