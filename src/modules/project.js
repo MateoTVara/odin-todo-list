@@ -26,9 +26,13 @@ class List {
     deleteDiv.classList.add("delete-btn");
     deleteDiv.textContent = "X";
     deleteDiv.addEventListener("click", () => {
-      this.cards = [];
       const element = document.querySelector(`[data-list-id="${this.id}"]`).parentElement;
       element.remove();
+
+      const projectId = ProjectManager.getProjectDiv().dataset.projectId;
+      const projectData = ProjectsManager.getCurrentProjectInstance(projectId);
+      projectData.lists.splice(projectData.lists.findIndex(list => list.id === this.id), 1);
+      ProjectsManager.update(projectData);
     });
 
     const title = document.createElement("input");
@@ -49,7 +53,7 @@ class List {
       console.log(`List ${this.id} title updated to: ${this.title}`);
       title.scrollLeft = 0;
       div.setAttribute("title", this.title);
-      const projectId = ProjectManager.getProjectDiv().dataset.projectId;
+      const projectId = ProjectManager.getProjectDiv().dataset.projectId;0
       const projectData = ProjectsManager.getCurrentProjectInstance(projectId);
       projectData.lists.forEach(list => {if (list.id === this.id) list.title = this.title})
       ProjectsManager.update(projectData);

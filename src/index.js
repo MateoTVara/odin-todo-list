@@ -27,6 +27,7 @@ class Project {
     ProjectsManager.toggleProjectsDisplay();
     ProjectsManager.toggleProjectDisplay();
     ProjectsManager.setProjectDivDatasetProjectId(this.id);
+    ProjectsManager.getProjectDiv().scrollLeft = 0;
     ProjectManager.renderAllProjectLists()
   }
 
@@ -242,12 +243,14 @@ const ProjectsManager = (function() {
   });
 
   const getProjectsDiv = () => projectsDiv;
+  const getProjectDiv = () => projectDiv;
   const getAddProjectDiv = () => addProjectDiv;
 
   renderAllProjects();
 
   return { 
     getProjectsDiv,
+    getProjectDiv,
     getAddProjectDiv,
     toggleProjectsDisplay,
     toggleProjectDisplay,
