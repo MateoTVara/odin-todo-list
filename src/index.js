@@ -1,6 +1,7 @@
 // index.js
 
 import { createSwapy } from 'swapy';
+import { Helper } from './modules/helper';
 import { List, Card } from './modules/project';
 import "./styles.css";
 
@@ -9,16 +10,9 @@ let isDragging = false;
 class Project {
   constructor(name) {
     this.name = name;
-    this.color = this.#generateRandomColor();
+    this.color = Helper.randomColor();
     this.id = crypto.randomUUID();
     this.lists = [];
-  }
-
-  #generateRandomColor() {
-    const r = Math.floor(Math.random() * 256);
-    const g = Math.floor(Math.random() * 256);
-    const b = Math.floor(Math.random() * 256);
-    return `rgb(${r}, ${g}, ${b})`
   }
 
   #handleClick() {
@@ -38,42 +32,42 @@ class Project {
   }
 
   getElement () {
-    const slotDiv = document.createElement("div");
-    slotDiv.dataset.swapySlot = this.id;
+    const handle = Helper.createElement("div", {
+      classes: ["handle"], 
+      dataAttrs: {swapyHandle: ""}
+    })
+
+    const deleteBtn = Helper.createElement("div", {
+      text: "X", 
+      classes: ["delete-btn"],
+      listeners: {
+        click: (e) => {
+        e.stopPropagation();
+        this.#handleDelete();
+      }}
+    })
+
+    const colorContainer = Helper.createElement("div", {
+      styles: {backgroundColor: this.color}, 
+      children: [handle, deleteBtn]
+    })
+
+    const title = Helper.createElement("h2", {text: this.name})
+
+    const projectContainer = Helper.createElement("div", {
+      classes: ["project-item"],
+      attrs: {title: this.name},
+      dataAttrs: {projectId: this.id, swapyItem: this.id},
+      listeners: {click: () => this.#handleClick()},
+      children: [colorContainer, title]
+    })
     
-    const div = document.createElement("div");
-    div.classList.add("project-item");
-    div.setAttribute("title", this.name);
-    div.dataset.projectId = this.id;
-    div.dataset.swapyItem = this.id;
-
-    div.addEventListener("click", () => this.#handleClick());
-
-    const deleteDiv = document.createElement("div");
-    deleteDiv.classList.add("delete-btn");
-    deleteDiv.textContent = "X";
-    deleteDiv.addEventListener("click", (e) => {
-      e.stopPropagation();
-      this.#handleDelete()
+    const projectElement = Helper.createElement("div", {
+      dataAttrs: {swapySlot: this.id}, 
+      children: [projectContainer]
     });
 
-    const handleDiv = document.createElement("div");
-    handleDiv.classList.add("handle");
-    handleDiv.dataset.swapyHandle = "";
-
-    const colorDiv = document.createElement("div");
-    colorDiv.style.backgroundColor = this.color;
-
-    const h2 = document.createElement("h2");
-    h2.textContent = this.name;
-
-    colorDiv.append(handleDiv, deleteDiv);
-
-    div.append(colorDiv, h2);
-    
-    slotDiv.appendChild(div);
-    
-    return slotDiv;
+    return projectElement;
   }
 }
 
