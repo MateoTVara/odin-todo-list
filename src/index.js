@@ -2,10 +2,15 @@
 
 import { createSwapy } from 'swapy';
 import { Helper } from './modules/helper';
+import { PersistenceManager } from './modules/persistence';
 import { List, Card } from './modules/project';
 import "./styles.css";
 
 let isDragging = false;
+
+const persistenceManager = new PersistenceManager();
+const projects = persistenceManager.loadProjects();
+const projectsOrder = persistenceManager.loadProjectsOrder();
 
 class Project {
   constructor(name) {
@@ -26,7 +31,7 @@ class Project {
   }
 
   #handleDelete() {
-    ProjectsManager.remove(this.id);
+    persistenceManager.removeProject(projects, projectsOrder, this);
     const element = document.querySelector(`[data-project-id="${this.id}"]`).parentElement;
     element.remove();
   }
@@ -111,23 +116,28 @@ const DialogManager = (function() {
 })();
 
 const ProjectsManager = (function() {
-  const PROJECTS_STORAGE_KEY = "projects";
-  const ORDER_STORAGE_KEY = "projects-order";
-
-  const projects = (function() {
-    const raw = localStorage.getItem(PROJECTS_STORAGE_KEY);
-    return raw ? JSON.parse(raw): {};
-  })();
-
-  const projectsOrder = (function() {
-    const raw = localStorage.getItem(ORDER_STORAGE_KEY);
-    return raw ? JSON.parse(raw): [];
-  })();
-
   const projectsShortcut = document.querySelector(".header > a");
   const projectsDiv = document.querySelector(".projects");
   const projectDiv = document.querySelector(".project");
   const addProjectDiv = document.querySelector(".add-project");
+
+  const getProjectInstanceById = (projects, projectId) => {
+    const projectData = projects[projectId];
+    const project = new Project(projectData.name);
+    project.id = projectId;
+    project.color = projectData.color;
+    project.lists = projectData.lists.map(listData => {
+      const list = new List(listData.title);
+      list.id = listData.id;
+      list.cards = listData.cards.map(cardData => {
+        const card = new Card(cardData.description, cardData.locked);
+        card.id = cardData.id;
+        return card;
+      })
+      return list;
+    })
+    return project;
+  }
 
   const toggleProjectsDisplay = () => {
     projectsDiv.classList.toggle("none-display");
@@ -145,81 +155,10 @@ const ProjectsManager = (function() {
     delete projectDiv.dataset.projectId;
   }
 
-  const getCard = (cardData) => {
-    const card = new Card(cardData.description, cardData.locked);
-    card.id = cardData.id;
-
-    return card;
-  }
-
-  const getList = (listData) => {
-    const list = new List(listData.title);
-    list.id = listData.id;
-    list.cards = listData.cards.map(card => getCard(card));
-
-    return list;
-  }
-
-  const getCurrentProjectInstance = (projectId) => {
-    const projectData = projects[projectId];
-    const project = new Project(projectData.name);
-    project.id = projectId;
-    project.color = projectData.color;
-    project.lists = projectData.lists.map(list => getList(list));
-    return project;
-  }
-
-  const serializeProject = (projectData) => {
-    return {
-      name: projectData.name,
-      color: projectData.color,
-      lists: projectData.lists.map(list => ({
-        id: list.id,
-        title: list.title,
-        cards: list.cards.map(card => ({
-          id: card.id,
-          description: card.description,
-          locked: card.locked
-        }))
-      }))
-    }
-  }
-
-  const save = () => {
-    localStorage.setItem(PROJECTS_STORAGE_KEY, JSON.stringify(projects));
-    localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(projectsOrder))
-  }
-
-  const add = (projectData) => {
-    projects[projectData.id] = serializeProject(projectData);
-    projectsOrder.push(projectData.id);
-    save();
-  }
-
-  const remove = (projectId) => {
-    if (projects[projectId]){
-      delete projects[projectId];
-      const index = projectsOrder.indexOf(projectId);
-      projectsOrder.splice(index, 1);
-      save();
-    }
-  }
-
-  const update = (projectData) => {
-    projects[projectData.id] = serializeProject(projectData);
-    save();
-  }
-
-  const updateOrder = (newOrder) => {
-    projectsOrder.length = 0;
-    projectsOrder.push(...newOrder);
-    save();
-  }
-
   const renderAllProjects = () => {
     projectsDiv.querySelectorAll(".project-item").forEach(element => element.remove());
     projectsOrder.forEach(persistedProjectId => {
-      const project = getCurrentProjectInstance(persistedProjectId);
+      const project = getProjectInstanceById(projects, persistedProjectId);
       projectsDiv.insertBefore(project.getElement(), addProjectDiv);
     })
   }
@@ -244,17 +183,13 @@ const ProjectsManager = (function() {
   renderAllProjects();
 
   return { 
+    getProjectInstanceById,
     getProjectsDiv,
     getProjectDiv,
     getAddProjectDiv,
     toggleProjectsDisplay,
     toggleProjectDisplay,
     setProjectDivDatasetProjectId,
-    getCurrentProjectInstance,
-    add,
-    remove,
-    update,
-    updateOrder,
     projects, 
   };
 })();
@@ -282,7 +217,7 @@ const ProjectManager = (function () {
   }
 
   const renderAllProjectLists = () => {
-    const currentProject = ProjectsManager.getCurrentProjectInstance(projectDiv.dataset.projectId);
+    const currentProject = ProjectsManager.getProjectInstanceById(projects, projectDiv.dataset.projectId);
     currentProject.lists.forEach(list => {
       renderList(list);
     });
@@ -293,12 +228,12 @@ const ProjectManager = (function () {
   }
 
   addListDiv.addEventListener("click", () => {
-    const currentProject = ProjectsManager.getCurrentProjectInstance(projectDiv.dataset.projectId);
+    const currentProject = ProjectsManager.getProjectInstanceById(projects, projectDiv.dataset.projectId);
     const list = new List();
 
     currentProject.lists.push(list);
 
-    ProjectsManager.update(currentProject);
+    persistenceManager.updateProjects(projects, currentProject);
 
     const listElement = renderList(list);
     const listTitle = listElement.querySelector(".title");
@@ -323,7 +258,7 @@ const SwapyManager = (function(){
 
   swapy.onSwapEnd(() => {
     const newOrder = Array.from(ProjectsManager.getProjectsDiv().querySelectorAll("[data-project-id]")).map(e => e.dataset.projectId);
-    ProjectsManager.updateOrder(newOrder);
+    persistenceManager.updateProjectsOrder(projectsOrder, newOrder);
 
     setTimeout(() => {
       isDragging = false;
@@ -334,4 +269,4 @@ const SwapyManager = (function(){
   return { swapy };
 })();
 
-export { ProjectsManager, ProjectManager };
+export { ProjectsManager, ProjectManager, Project, persistenceManager, projects };

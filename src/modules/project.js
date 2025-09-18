@@ -1,7 +1,7 @@
 // project.js
 
 import { Helper } from "./helper";
-import { ProjectsManager, ProjectManager } from "../index";
+import { ProjectsManager, ProjectManager, persistenceManager, projects } from "../index";
 
 class List {
   constructor(title="New List") {
@@ -31,9 +31,9 @@ class List {
           title.scrollLeft = 0;
           listElement.setAttribute("title", this.title);
           const projectId = ProjectManager.getProjectDiv().dataset.projectId;
-          const projectData = ProjectsManager.getCurrentProjectInstance(projectId);
+          const projectData = ProjectsManager.getProjectInstanceById(projects, projectId);
           projectData.lists.forEach(list => {if (list.id === this.id) list.title = this.title});
-          ProjectsManager.update(projectData);
+          persistenceManager.updateProjects(projects, projectData);
         }
       }
     });
@@ -47,9 +47,9 @@ class List {
           element.remove();
 
           const projectId = ProjectManager.getProjectDiv().dataset.projectId;
-          const projectData = ProjectsManager.getCurrentProjectInstance(projectId);
+          const projectData = ProjectsManager.getProjectInstanceById(projects, projectId);
           projectData.lists.splice(projectData.lists.findIndex(list => list.id === this.id), 1);
-          ProjectsManager.update(projectData);
+          persistenceManager.updateProjects(projects, projectData);
         }
       }
     });
@@ -66,12 +66,12 @@ class List {
         click: (e) => {
           e.preventDefault();
           const projectDiv = document.querySelector(".project");
-          const currentProject = ProjectsManager.getCurrentProjectInstance(projectDiv.dataset.projectId);
+          const currentProject = ProjectsManager.getProjectInstanceById(projects, projectDiv.dataset.projectId);
           const card = new Card();
           const thisListId = this.id;
           const thisList = currentProject.lists.find(list => list.id === thisListId);
           thisList.cards.push(card);
-          ProjectsManager.update(currentProject);
+          persistenceManager.updateProjects(projects, currentProject);
 
           const el = card.getElement();
           listContainer.insertBefore(el, addCardDiv);
@@ -130,7 +130,7 @@ class Card {
           this.locked = true;
 
           const projectId = ProjectsManager.getProjectDiv().dataset.projectId;
-          const projectData = ProjectsManager.getCurrentProjectInstance(projectId);
+          const projectData = ProjectsManager.getProjectInstanceById(projects, projectId);
           const listItem = cardElement.closest(".list-item");
           const listId = listItem.dataset.listId;
           const listOfThisCard = projectData.lists.find(list => list.id === listId)
@@ -144,7 +144,7 @@ class Card {
               })
             }
           })
-          ProjectsManager.update(projectData);
+          persistenceManager.updateProjects(projects, projectData);
         },
         keydown: (e) => {
           if (e.key === "Enter") {
