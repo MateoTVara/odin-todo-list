@@ -1,0 +1,1 @@
+export {dialogManager} from './DialogManager';

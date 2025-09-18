@@ -1,110 +1,12 @@
 // index.js
 
 import { createSwapy } from 'swapy';
-import { Helper } from './modules/helper';
+import { Project, List, Card } from './models';
 import { persistenceManager, projects, projectsOrder } from './modules/persistence';
-import { List, Card } from './modules/project';
+import { dialogManager } from './managers';
 import "./styles.css";
 
 let isDragging = false;
-
-class Project {
-  constructor(name) {
-    this.name = name;
-    this.color = Helper.randomColor();
-    this.id = crypto.randomUUID();
-    this.lists = [];
-  }
-
-  #handleClick() {
-    if (isDragging) return;
-    console.log(`Project: ${this.name}`);
-    ProjectsManager.toggleProjectsDisplay();
-    ProjectsManager.toggleProjectDisplay();
-    ProjectsManager.setProjectDivDatasetProjectId(this.id);
-    ProjectsManager.getProjectDiv().scrollLeft = 0;
-    ProjectManager.renderAllProjectLists()
-  }
-
-  #handleDelete() {
-    persistenceManager.removeProject(this);
-    const element = document.querySelector(`[data-project-id="${this.id}"]`).parentElement;
-    element.remove();
-  }
-
-  getElement () {
-    const handle = Helper.createElement("div", {
-      classes: ["handle"], 
-      dataAttrs: {swapyHandle: ""}
-    })
-
-    const deleteBtn = Helper.createElement("div", {
-      text: "X", 
-      classes: ["delete-btn"],
-      listeners: {
-        click: (e) => {
-        e.stopPropagation();
-        this.#handleDelete();
-      }}
-    })
-
-    const colorContainer = Helper.createElement("div", {
-      styles: {backgroundColor: this.color}, 
-      children: [handle, deleteBtn]
-    })
-
-    const title = Helper.createElement("h2", {text: this.name})
-
-    const projectContainer = Helper.createElement("div", {
-      classes: ["project-item"],
-      attrs: {title: this.name},
-      dataAttrs: {projectId: this.id, swapyItem: this.id},
-      listeners: {click: () => this.#handleClick()},
-      children: [colorContainer, title]
-    })
-    
-    const projectElement = Helper.createElement("div", {
-      dataAttrs: {swapySlot: this.id}, 
-      children: [projectContainer]
-    });
-
-    return projectElement;
-  }
-}
-
-const DialogManager = (function() {
-  const addProjectDialog = document.querySelector(".add-project-dialog");
-  const addProjectFormButton = document.querySelector(".add-project-dialog form button");
-  const addProjectFormInput = document.querySelector(".add-project-dialog form input");
-
-  const toggleDialogDisplay = () => {
-    addProjectDialog.classList.toggle("none-display");
-  }
-
-  const renderProject = () => {
-    const project = new Project(addProjectFormInput.value);
-    persistenceManager.addProject(project);
-    ProjectsManager.getProjectsDiv().insertBefore(project.getElement(), ProjectsManager.getAddProjectDiv());
-    SwapyManager.swapy.update();
-    toggleDialogDisplay();
-    addProjectFormInput.value = "";
-  }
-
-  const getProjectNameInput = () => {return addProjectFormInput};
-
-  addProjectDialog.addEventListener("click", (e) => {
-    if (e.target === addProjectDialog) {
-      toggleDialogDisplay();
-    }
-  })
-
-  addProjectFormButton.addEventListener("click", (e) => {
-    e.preventDefault();
-    if (addProjectFormInput.value !== "") {renderProject();}
-  })
-
-  return { toggleDialogDisplay, getProjectNameInput };
-})();
 
 const ProjectsManager = (function() {
   const projectsShortcut = document.querySelector(".header > a");
@@ -163,8 +65,8 @@ const ProjectsManager = (function() {
   });
   
   addProjectDiv.addEventListener("click", () => {
-    DialogManager.toggleDialogDisplay();
-    DialogManager.getProjectNameInput().focus();
+    dialogManager.toggleDialogDisplay();
+    dialogManager.getProjectNameInput().focus();
   });
 
   const getProjectsDiv = () => projectsDiv;
@@ -180,13 +82,12 @@ const ProjectsManager = (function() {
     getAddProjectDiv,
     toggleProjectsDisplay,
     toggleProjectDisplay,
-    setProjectDivDatasetProjectId,
-    projects, 
+    setProjectDivDatasetProjectId
   };
 })();
 
 const ProjectManager = (function () {
-  const projectDiv = document.querySelector(".project");
+  const projectDiv = ProjectsManager.getProjectDiv();
   const addListDiv = document.querySelector(".add-list");
 
   const getProjectDiv = () => {return projectDiv};
@@ -260,4 +161,4 @@ const SwapyManager = (function(){
   return { swapy };
 })();
 
-export { ProjectsManager, ProjectManager, Project, persistenceManager, projects };
+export { ProjectsManager, ProjectManager, SwapyManager, isDragging };
