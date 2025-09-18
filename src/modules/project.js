@@ -30,9 +30,9 @@ class List {
           console.log(`List ${this.id} title updated to: ${this.title}`);
           title.scrollLeft = 0;
           listElement.setAttribute("title", this.title);
-          const projectId = ProjectManager.getProjectDiv().dataset.projectId;0
+          const projectId = ProjectManager.getProjectDiv().dataset.projectId;
           const projectData = ProjectsManager.getCurrentProjectInstance(projectId);
-          projectData.lists.forEach(list => {if (list.id === this.id) list.title = this.title})
+          projectData.lists.forEach(list => {if (list.id === this.id) list.title = this.title});
           ProjectsManager.update(projectData);
         }
       }
@@ -65,8 +65,14 @@ class List {
       listeners: {
         click: (e) => {
           e.preventDefault();
+          const projectDiv = document.querySelector(".project");
+          const currentProject = ProjectsManager.getCurrentProjectInstance(projectDiv.dataset.projectId);
           const card = new Card();
-          this.cards.push(card);
+          const thisListId = this.id;
+          const thisList = currentProject.lists.find(list => list.id === thisListId);
+          thisList.cards.push(card);
+          ProjectsManager.update(currentProject);
+
           const el = card.getElement();
           listContainer.insertBefore(el, addCardDiv);
           const input = el.querySelector("input");
@@ -96,9 +102,10 @@ class List {
 }
 
 class Card {
-  constructor(description="New Task") {
+  constructor(description="New Task", locked = false) {
     this.id = crypto.randomUUID();
     this.description = description;
+    this.locked = locked;
   }
 
   getElement() {
@@ -119,6 +126,25 @@ class Card {
           }
           console.log(this.description);
           description.scrollLeft = 0;
+
+          this.locked = true;
+
+          const projectId = ProjectsManager.getProjectDiv().dataset.projectId;
+          const projectData = ProjectsManager.getCurrentProjectInstance(projectId);
+          const listItem = cardElement.closest(".list-item");
+          const listId = listItem.dataset.listId;
+          const listOfThisCard = projectData.lists.find(list => list.id === listId)
+          projectData.lists.forEach(list => {
+            if (list.id === listOfThisCard.id){
+              list.cards.forEach(card => {
+                if(card.id === this.id) {
+                card.description = this.description;
+                card.locked = this.locked
+                }
+              })
+            }
+          })
+          ProjectsManager.update(projectData);
         },
         keydown: (e) => {
           if (e.key === "Enter") {
@@ -128,6 +154,8 @@ class Card {
         }
       }
     })
+
+    if (this.locked) description.setAttribute("disabled", "");
 
     const cardElement = Helper.createElement("div", {
       dataAttrs: {swapySlot: this.id}, 

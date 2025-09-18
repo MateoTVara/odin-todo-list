@@ -146,7 +146,7 @@ const ProjectsManager = (function() {
   }
 
   const getCard = (cardData) => {
-    const card = new Card(cardData.description);
+    const card = new Card(cardData.description, cardData.locked);
     card.id = cardData.id;
 
     return card;
@@ -178,7 +178,8 @@ const ProjectsManager = (function() {
         title: list.title,
         cards: list.cards.map(card => ({
           id: card.id,
-          description: card.description
+          description: card.description,
+          locked: card.locked
         }))
       }))
     }
@@ -264,9 +265,19 @@ const ProjectManager = (function () {
 
   const getProjectDiv = () => {return projectDiv};
 
+  const renderCard = (card, listItem, addCardItem) => {
+    const el = card.getElement();
+    listItem.insertBefore(el, addCardItem)
+  }
+
   const renderList = (list) => {
     const el = list.getElement();
+    const listItem = el.querySelector(".list-item");
+    const addCardItem = el.querySelector(".add-card");
     projectDiv.insertBefore(el, addListDiv);
+    list.cards.forEach(card => {
+      renderCard(card, listItem, addCardItem);
+    })
     return el;
   }
 
@@ -284,10 +295,9 @@ const ProjectManager = (function () {
   addListDiv.addEventListener("click", () => {
     const currentProject = ProjectsManager.getCurrentProjectInstance(projectDiv.dataset.projectId);
     const list = new List();
-    console.log("Add list clicked");
-    console.log("Current project:", currentProject.name);
+
     currentProject.lists.push(list);
-    console.log(currentProject.lists);
+
     ProjectsManager.update(currentProject);
 
     const listElement = renderList(list);
