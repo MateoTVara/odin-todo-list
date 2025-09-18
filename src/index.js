@@ -2,15 +2,11 @@
 
 import { createSwapy } from 'swapy';
 import { Helper } from './modules/helper';
-import { PersistenceManager } from './modules/persistence';
+import { persistenceManager, projects, projectsOrder } from './modules/persistence';
 import { List, Card } from './modules/project';
 import "./styles.css";
 
 let isDragging = false;
-
-const persistenceManager = new PersistenceManager();
-const projects = persistenceManager.loadProjects();
-const projectsOrder = persistenceManager.loadProjectsOrder();
 
 class Project {
   constructor(name) {
@@ -31,7 +27,7 @@ class Project {
   }
 
   #handleDelete() {
-    persistenceManager.removeProject(projects, projectsOrder, this);
+    persistenceManager.removeProject(this);
     const element = document.querySelector(`[data-project-id="${this.id}"]`).parentElement;
     element.remove();
   }
@@ -87,12 +83,7 @@ const DialogManager = (function() {
 
   const renderProject = () => {
     const project = new Project(addProjectFormInput.value);
-    ProjectsManager.add({
-      id: project.id,
-      name: project.name,
-      color: project.color,
-      lists: project.lists
-    });
+    persistenceManager.addProject(project);
     ProjectsManager.getProjectsDiv().insertBefore(project.getElement(), ProjectsManager.getAddProjectDiv());
     SwapyManager.swapy.update();
     toggleDialogDisplay();
@@ -233,7 +224,7 @@ const ProjectManager = (function () {
 
     currentProject.lists.push(list);
 
-    persistenceManager.updateProjects(projects, currentProject);
+    persistenceManager.updateProjects(currentProject);
 
     const listElement = renderList(list);
     const listTitle = listElement.querySelector(".title");
@@ -258,7 +249,7 @@ const SwapyManager = (function(){
 
   swapy.onSwapEnd(() => {
     const newOrder = Array.from(ProjectsManager.getProjectsDiv().querySelectorAll("[data-project-id]")).map(e => e.dataset.projectId);
-    persistenceManager.updateProjectsOrder(projectsOrder, newOrder);
+    persistenceManager.updateProjectsOrder(newOrder);
 
     setTimeout(() => {
       isDragging = false;

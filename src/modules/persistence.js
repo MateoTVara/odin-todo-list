@@ -1,34 +1,39 @@
 // persistence.js
 
-import { Project } from "../index"
-
 class PersistenceManager {
   constructor(){
     this.PROJECTS_STORAGE_KEY = "projects";
     this.ORDER_STORAGE_KEY = "projects-order";
+
+    this.projects = this.#loadProjects();
+    this.projectsOrder = this.#loadProjectsOrder();
   }
 
-  loadProjects() {
+  #loadProjects() {
     const raw = localStorage.getItem(this.PROJECTS_STORAGE_KEY);
     return raw ? JSON.parse(raw) : {};
   }
 
-  loadProjectsOrder() {
+  #loadProjectsOrder() {
     const raw = localStorage.getItem(this.ORDER_STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
   }
 
-  saveProjects(projects) {
-    localStorage.setItem(this.PROJECTS_STORAGE_KEY, JSON.stringify(projects));
+  getProjects() {return this.projects};
+
+  getProjectsOrder() {return this.projectsOrder};
+
+  saveProjects() {
+    localStorage.setItem(this.PROJECTS_STORAGE_KEY, JSON.stringify(this.projects));
   }
 
-  saveProjectsOrder(projectsOrder) {
-    localStorage.setItem(this.ORDER_STORAGE_KEY, JSON.stringify(projectsOrder));
+  saveProjectsOrder() {
+    localStorage.setItem(this.ORDER_STORAGE_KEY, JSON.stringify(this.projectsOrder));
   }
 
-  saveProjectsAndTheirOrder(projects, projectsOrder) {
-    this.saveProjects(projects);
-    this.saveProjectsOrder(projectsOrder);
+  saveProjectsAndTheirOrder() {
+    this.saveProjects(this.projects);
+    this.saveProjectsOrder(this.projectsOrder);
   }
 
   serializeProject(projectInstance) {
@@ -47,28 +52,30 @@ class PersistenceManager {
     }
   }
 
-  addProject(projects, projectsOrder, projectInstance) {
-    projects[projectInstance.id] = this.serializeProject(projectInstance);
-    projectsOrder.push(projectInstance.id);
-    this.saveProjectsAndTheirOrder(projects, projectsOrder);
+  addProject(projectInstance) {
+    this.projects[projectInstance.id] = this.serializeProject(projectInstance);
+    this.projectsOrder.push(projectInstance.id);
+    this.saveProjectsAndTheirOrder();
   }
 
-  removeProject(projects, projectsOrder, projectInstance) {
-    delete projects[projectInstance.id];
-    projectsOrder.splice(projectsOrder.indexOf(projectInstance.id), 1);
-    this.saveProjectsAndTheirOrder(projects, projectsOrder);
+  removeProject(projectInstance) {
+    delete this.projects[projectInstance.id];
+    this.projectsOrder.splice(this.projectsOrder.indexOf(projectInstance.id), 1);
+    this.saveProjectsAndTheirOrder();
   }
 
-  updateProjects(projects, projectInstance) {
-    projects[projectInstance.id] = this.serializeProject(projectInstance);
-    this.saveProjects(projects);
+  updateProjects(projectInstance) {
+    this.projects[projectInstance.id] = this.serializeProject(projectInstance);
+    this.saveProjects();
   }
 
-  updateProjectsOrder(projectsOrder, newOrder) {
-    projectsOrder.length = 0;
-    projectsOrder.push(...newOrder);
-    this.saveProjectsOrder(projectsOrder);
+  updateProjectsOrder(newOrder) {
+    this.projectsOrder.length = 0;
+    this.projectsOrder.push(...newOrder);
+    this.saveProjectsOrder();
   }
 }
 
-export { PersistenceManager };
+export const persistenceManager = new PersistenceManager();
+export const projects = persistenceManager.getProjects();
+export const projectsOrder = persistenceManager.getProjectsOrder();

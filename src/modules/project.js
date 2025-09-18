@@ -1,7 +1,8 @@
 // project.js
 
 import { Helper } from "./helper";
-import { ProjectsManager, ProjectManager, persistenceManager, projects } from "../index";
+import { persistenceManager, projects } from "./persistence";
+import { ProjectsManager, ProjectManager } from "../index";
 
 class List {
   constructor(title="New List") {
@@ -33,7 +34,7 @@ class List {
           const projectId = ProjectManager.getProjectDiv().dataset.projectId;
           const projectData = ProjectsManager.getProjectInstanceById(projects, projectId);
           projectData.lists.forEach(list => {if (list.id === this.id) list.title = this.title});
-          persistenceManager.updateProjects(projects, projectData);
+          persistenceManager.updateProjects(projectData);
         }
       }
     });
@@ -49,7 +50,7 @@ class List {
           const projectId = ProjectManager.getProjectDiv().dataset.projectId;
           const projectData = ProjectsManager.getProjectInstanceById(projects, projectId);
           projectData.lists.splice(projectData.lists.findIndex(list => list.id === this.id), 1);
-          persistenceManager.updateProjects(projects, projectData);
+          persistenceManager.updateProjects(projectData);
         }
       }
     });
@@ -71,7 +72,7 @@ class List {
           const thisListId = this.id;
           const thisList = currentProject.lists.find(list => list.id === thisListId);
           thisList.cards.push(card);
-          persistenceManager.updateProjects(projects, currentProject);
+          persistenceManager.updateProjects(currentProject);
 
           const el = card.getElement();
           listContainer.insertBefore(el, addCardDiv);
@@ -144,7 +145,7 @@ class Card {
               })
             }
           })
-          persistenceManager.updateProjects(projects, projectData);
+          persistenceManager.updateProjects(projectData);
         },
         keydown: (e) => {
           if (e.key === "Enter") {
