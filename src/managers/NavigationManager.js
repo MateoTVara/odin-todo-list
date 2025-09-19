@@ -1,37 +1,33 @@
 // src/managers/NavigationManager.js
 
-import { projectManager } from "../managers";
+import { projectManager, domManager } from "../managers";
 
 class NavigationManager {
   constructor() {
-    this.projectsShortcut = document.querySelector(".header > a");
-    this.projectsDiv = document.querySelector(".projects");
-    this.projectDiv = document.querySelector(".project");
-
     this.initEventListeners();
   }
 
   toggleProjectsDisplay() {
-    this.projectsDiv.classList.toggle("none-display");
+    domManager.projectsDiv.classList.toggle("none-display");
   }
 
   toggleProjectDisplay() {
-    this.projectDiv.classList.toggle("none-display");
+    domManager.projectDiv.classList.toggle("none-display");
   }
 
   setProjectDivDatasetProjectId(projectId) {
-    this.projectDiv.dataset.projectId = projectId;
+    domManager.projectDiv.dataset.projectId = projectId;
   }
 
   removeProjectDivDatasetProjectId() {
-    delete this.projectDiv.dataset.projectId;
+    delete domManager.projectDiv.dataset.projectId;
   }
 
   initEventListeners() {
-    this.projectsShortcut.addEventListener("click", (e) => {
+    domManager.projectsShortcut.addEventListener("click", (e) => {
       e.preventDefault();
-      this.projectDiv.classList.add("none-display");
-      this.projectsDiv.classList.remove("none-display");
+      domManager.projectDiv.classList.add("none-display");
+      domManager.projectsDiv.classList.remove("none-display");
       projectManager.clearListsDivs();
       this.removeProjectDivDatasetProjectId();
     });

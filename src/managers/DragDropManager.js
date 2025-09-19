@@ -2,6 +2,7 @@
 
 import { createSwapy } from 'swapy';
 import { persistenceManager } from '../modules/persistence';
+import { domManager } from '../managers';
 
 class DragDropManager {
   constructor(container) {
@@ -37,4 +38,4 @@ class DragDropManager {
   }
 }
 
-export const dragDropManager = new DragDropManager(document.querySelector(".projects"));
+export const dragDropManager = new DragDropManager(domManager.projectsDiv);

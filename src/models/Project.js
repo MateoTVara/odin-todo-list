@@ -2,7 +2,7 @@
 
 import { Helper } from "../modules/helper";
 import { persistenceManager } from "../modules/persistence";
-import { projectManager, navigationManager, dragDropManager } from "../managers";
+import { projectManager, navigationManager, dragDropManager, domManager } from "../managers";
 
 export class Project {
   constructor(name) {
@@ -10,22 +10,6 @@ export class Project {
     this.color = Helper.randomColor();
     this.id = crypto.randomUUID();
     this.lists = [];
-  }
-
-  #handleClick() {
-    if (dragDropManager.isDragging) return;
-    console.log(`Project: ${this.name}`);
-    navigationManager.toggleProjectsDisplay();
-    navigationManager.toggleProjectDisplay();
-    navigationManager.setProjectDivDatasetProjectId(this.id);
-    navigationManager.projectDiv.scrollLeft = 0;
-    projectManager.renderAllProjectLists()
-  }
-
-  #handleDelete() {
-    persistenceManager.removeProject(this);
-    const element = document.querySelector(`[data-project-id="${this.id}"]`).parentElement;
-    element.remove();
   }
 
   getElement () {
@@ -37,11 +21,7 @@ export class Project {
     const deleteBtn = Helper.createElement("div", {
       text: "X", 
       classes: ["delete-btn"],
-      listeners: {
-        click: (e) => {
-        e.stopPropagation();
-        this.#handleDelete();
-      }}
+      listeners: {click: (e) => this.#handleDelete(e)}
     })
 
     const colorContainer = Helper.createElement("div", {
@@ -65,5 +45,22 @@ export class Project {
     });
 
     return projectElement;
+  }
+
+  #handleClick() {
+    if (dragDropManager.isDragging) return;
+    console.log(`Project: ${this.name}`);
+    navigationManager.toggleProjectsDisplay();
+    navigationManager.toggleProjectDisplay();
+    navigationManager.setProjectDivDatasetProjectId(this.id);
+    domManager.projectDiv.scrollLeft = 0;
+    projectManager.renderAllProjectLists()
+  }
+
+  #handleDelete(e) {
+    e.stopPropagation();
+    persistenceManager.removeProject(this);
+    const element = document.querySelector(`[data-project-id="${this.id}"]`).parentElement;
+    element.remove();
   }
 }
