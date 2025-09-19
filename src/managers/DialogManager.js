@@ -1,14 +1,16 @@
 // src/managers/DialogManager.js
 
-import { Project } from '../models';
 import { persistenceManager } from '../modules/persistence';
-import { ProjectsManager, SwapyManager } from '../index';
+import { navigationManager, projectsManager, dragDropManager } from '../managers';
+import { Project } from '../models';
 
 class DialogManager {
   constructor() {
     this.addProjectDialog = document.querySelector(".add-project-dialog");
     this.addProjectFormButton = document.querySelector(".add-project-dialog form button");
     this.addProjectFormInput = document.querySelector(".add-project-dialog form input");
+
+    this.initEventListeners();
   }
 
   toggleDialogDisplay() {
@@ -18,8 +20,8 @@ class DialogManager {
   renderProject() {
     const project = new Project(this.addProjectFormInput.value);
     persistenceManager.addProject(project);
-    ProjectsManager.getProjectsDiv().insertBefore(project.getElement(), ProjectsManager.getAddProjectDiv());
-    SwapyManager.swapy.update();
+    navigationManager.projectsDiv.insertBefore(project.getElement(), projectsManager.addProjectDiv);
+    dragDropManager.update();
     this.toggleDialogDisplay();
     this.addProjectFormInput.value = "";
   }

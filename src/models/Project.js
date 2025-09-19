@@ -2,7 +2,7 @@
 
 import { Helper } from "../modules/helper";
 import { persistenceManager } from "../modules/persistence";
-import { ProjectsManager, ProjectManager, isDragging } from "../index";
+import { projectManager, navigationManager, dragDropManager } from "../managers";
 
 export class Project {
   constructor(name) {
@@ -13,13 +13,13 @@ export class Project {
   }
 
   #handleClick() {
-    if (isDragging) return;
+    if (dragDropManager.isDragging) return;
     console.log(`Project: ${this.name}`);
-    ProjectsManager.toggleProjectsDisplay();
-    ProjectsManager.toggleProjectDisplay();
-    ProjectsManager.setProjectDivDatasetProjectId(this.id);
-    ProjectsManager.getProjectDiv().scrollLeft = 0;
-    ProjectManager.renderAllProjectLists()
+    navigationManager.toggleProjectsDisplay();
+    navigationManager.toggleProjectDisplay();
+    navigationManager.setProjectDivDatasetProjectId(this.id);
+    navigationManager.projectDiv.scrollLeft = 0;
+    projectManager.renderAllProjectLists()
   }
 
   #handleDelete() {

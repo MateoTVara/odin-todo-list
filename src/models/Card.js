@@ -2,7 +2,7 @@
 
 import { Helper } from "../modules/helper";
 import { persistenceManager, projects } from "../modules/persistence";
-import { ProjectsManager } from "../index";
+import { navigationManager, projectsManager } from "../managers";
 
 export class Card {
   constructor(description="New Task", locked = false) {
@@ -32,8 +32,8 @@ export class Card {
 
           this.locked = true;
 
-          const projectId = ProjectsManager.getProjectDiv().dataset.projectId;
-          const projectData = ProjectsManager.getProjectInstanceById(projects, projectId);
+          const projectId = navigationManager.projectDiv.dataset.projectId;
+          const projectData = projectsManager.getProjectInstanceById(projects, projectId);
           const listItem = cardElement.closest(".list-item");
           const listId = listItem.dataset.listId;
           const listOfThisCard = projectData.lists.find(list => list.id === listId)

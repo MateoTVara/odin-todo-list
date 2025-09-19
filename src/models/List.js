@@ -1,9 +1,9 @@
 // src/models/List.js
 
 import { Helper } from "../modules/helper";
-import { Card } from "./Card";
 import { persistenceManager, projects } from "../modules/persistence";
-import { ProjectsManager, ProjectManager } from "../index";
+import { projectsManager, projectManager } from "../managers";
+import { Card } from "./Card";
 
 export class List {
   constructor(title="New List") {
@@ -32,8 +32,8 @@ export class List {
           console.log(`List ${this.id} title updated to: ${this.title}`);
           title.scrollLeft = 0;
           listElement.setAttribute("title", this.title);
-          const projectId = ProjectManager.getProjectDiv().dataset.projectId;
-          const projectData = ProjectsManager.getProjectInstanceById(projects, projectId);
+          const projectId = projectManager.projectDiv.dataset.projectId;
+          const projectData = projectsManager.getProjectInstanceById(projects, projectId);
           projectData.lists.forEach(list => {if (list.id === this.id) list.title = this.title});
           persistenceManager.updateProjects(projectData);
         }
@@ -48,8 +48,8 @@ export class List {
           const element = document.querySelector(`[data-list-id="${this.id}"]`).parentElement;
           element.remove();
 
-          const projectId = ProjectManager.getProjectDiv().dataset.projectId;
-          const projectData = ProjectsManager.getProjectInstanceById(projects, projectId);
+          const projectId = projectManager.projectDiv.dataset.projectId;
+          const projectData = projectsManager.getProjectInstanceById(projects, projectId);
           projectData.lists.splice(projectData.lists.findIndex(list => list.id === this.id), 1);
           persistenceManager.updateProjects(projectData);
         }
@@ -68,7 +68,7 @@ export class List {
         click: (e) => {
           e.preventDefault();
           const projectDiv = document.querySelector(".project");
-          const currentProject = ProjectsManager.getProjectInstanceById(projects, projectDiv.dataset.projectId);
+          const currentProject = projectsManager.getProjectInstanceById(projects, projectDiv.dataset.projectId);
           const card = new Card();
           const thisListId = this.id;
           const thisList = currentProject.lists.find(list => list.id === thisListId);
