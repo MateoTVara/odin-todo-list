@@ -19,7 +19,25 @@
       <div class="add-list">+ add list</div>
     </div>
     <dialog class="card-modal none-display">
-      <div></div>
+      <div class="modal-content">
+        <menu type="toolbar" class="card-menu">
+          <div>
+            <input type="date" name="date" id="date">
+            <label for="date">Due Date</label>
+          </div>
+
+          <button type="button">Checklist</button>
+
+          <div>
+            <select name="priority" id="priority" required>
+              <option value="" disabled selected hidden>Priority</option>
+              <option value="low">low</option>
+              <option value="medium">medium</option>
+              <option value="high">high</option>
+            </select>
+          </div>
+        </menu>
+      </div>
     </dialog>
   </main>
   <dialog class="add-project-dialog none-display">
