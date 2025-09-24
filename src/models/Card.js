@@ -32,10 +32,22 @@ export class Card {
 
     this.cardElement = Helper.createElement("div", {
       dataAttrs: { swapySlot: this.id },
+      listeners: {click: () => this.#handleClick()},
       children: [this.descriptionInput]
     });
 
     return this.cardElement;
+  }
+
+  #handleClick() {
+    console.log('Card clicked');
+    domManager.cardModal.classList.remove("none-display");
+
+    const h3 = Helper.createElement("h3", {
+      text: this.description
+    })
+
+    domManager.cardModalDiv.appendChild(h3);
   }
 
   #handleBlur() {

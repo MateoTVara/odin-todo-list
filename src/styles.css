@@ -218,6 +218,29 @@ div[data-swapy-slot] > .project-item {
   border: none;
   width: 100%;
   padding: 4px 8px;
+  pointer-events: none;
+}
+
+.board .card-modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(0, 0, 0, 0.25);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.board .card-modal > div {
+  padding: 32px;
+  background-color: white;
+}
+
+.board .card-modal.none-display {
+  display: none;
 }
 
 .project .card-item:focus {
@@ -244,7 +267,7 @@ div[data-swapy-slot] > .project-item {
 
 /* Dialog */
 
-dialog {
+.add-project-dialog {
   display: flex;
   align-items: center;
   justify-content: center;

@@ -17,6 +17,9 @@ class DOMManager {
     this.addProjectDialog = document.querySelector(".add-project-dialog");
     this.addProjectFormButton = document.querySelector(".add-project-dialog form button");
     this.addProjectFormInput = document.querySelector(".add-project-dialog form input");
+
+    this.cardModal = document.querySelector(".card-modal");
+    this.cardModalDiv = document.querySelector(".card-modal > div")
   }
 }
 
