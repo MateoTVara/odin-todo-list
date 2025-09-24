@@ -2,7 +2,7 @@
 
 import { Helper } from "../modules/helper";
 import { persistenceManager, projects } from "../modules/persistence";
-import { projectsManager, domManager } from "../managers";
+import { projectsManager, domManager, cardModalManager } from "../managers";
 
 export class Card {
   constructor(description = "New Task", locked = false) {
@@ -43,11 +43,13 @@ export class Card {
     console.log('Card clicked');
     domManager.cardModal.classList.remove("none-display");
 
-    const h3 = Helper.createElement("h3", {
-      text: this.description
-    })
+    cardModalManager.populateModal(this.id);
 
-    domManager.cardModalDiv.appendChild(h3);
+    // const h3 = Helper.createElement("h3", {
+    //   text: this.description
+    // })
+
+    // domManager.cardModalDiv.appendChild(h3);
   }
 
   #handleBlur() {
