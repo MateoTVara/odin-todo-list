@@ -13,16 +13,18 @@ class CardModalManager {
     domManager.cardModal.addEventListener("click", (e) => {
       if (e.target === domManager.cardModal){
         domManager.cardModal.classList.add("none-display");
-        domManager.cardModalDiv.replaceChildren();
+        [...domManager.cardModalDiv.children].forEach(child => {
+          if (child !== domManager.cardMenu) child.remove();
+        });
       }
     });
   }
 
   #createModalElements(card) {
     const h3Description = Helper.createElement("h3", {text: card.description});
-    domManager.cardModalDiv.appendChild(h3Description);
-
-    domManager.cardModalDiv.appendChild(Helper.createElement("p", {text: `prueba-id: ${card.id}`}));
+    
+    domManager.cardMenu.insertAdjacentElement("afterend", Helper.createElement("p", {text: `prueba-id: ${card.id}`}));
+    domManager.cardMenu.insertAdjacentElement("afterend", h3Description);
   }
 
   populateModal(cardId) {

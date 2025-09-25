@@ -19,7 +19,6 @@ export class Project {
     })
 
     const deleteBtn = Helper.createElement("div", {
-      text: "X", 
       classes: ["delete-btn"],
       listeners: {click: (e) => this.#handleDelete(e)}
     })

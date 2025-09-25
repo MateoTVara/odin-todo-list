@@ -28,7 +28,6 @@ export class List {
     });
 
     const deleteBtn = Helper.createElement("div", {
-      text: "X",
       classes: ["delete-btn"],
       listeners: { click: () => this.#handleDelete() }
     });

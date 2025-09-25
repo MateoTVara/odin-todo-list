@@ -20,6 +20,7 @@ class DOMManager {
 
     this.cardModal = document.querySelector(".card-modal");
     this.cardModalDiv = document.querySelector(".card-modal > div")
+    this.cardMenu = document.querySelector(".card-menu");
   }
 }
 
