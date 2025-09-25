@@ -296,6 +296,20 @@ div[data-swapy-slot] > .project-item {
   height: fit-content;
 }
 
+.modal-content .card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.modal-content .buttons {
+  align-self: flex-end;
+
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
 .board .card-modal.none-display {
   display: none;
 }

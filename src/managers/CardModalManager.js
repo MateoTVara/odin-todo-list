@@ -13,18 +13,24 @@ class CardModalManager {
     domManager.cardModal.addEventListener("click", (e) => {
       if (e.target === domManager.cardModal){
         domManager.cardModal.classList.add("none-display");
-        [...domManager.cardModalDiv.children].forEach(child => {
-          if (child !== domManager.cardMenu) child.remove();
-        });
+        domManager.cardDetails.replaceChildren();
       }
     });
   }
 
   #createModalElements(card) {
     const h3Description = Helper.createElement("h3", {text: card.description});
+    const pTestId = Helper.createElement("p", {text: `test-id: ${card.id}`});
+
+    const saveButton = Helper.createElement("button", {text: "Save"});
+    const deleteButton = Helper.createElement("button", {text: "Delete"});
+
+    const buttonsDiv = Helper.createElement("div", {
+      classes: ["buttons"],
+      children: [saveButton, deleteButton]
+    });
     
-    domManager.cardMenu.insertAdjacentElement("afterend", Helper.createElement("p", {text: `prueba-id: ${card.id}`}));
-    domManager.cardMenu.insertAdjacentElement("afterend", h3Description);
+    domManager.cardDetails.append(h3Description, pTestId, buttonsDiv);
   }
 
   populateModal(cardId) {
