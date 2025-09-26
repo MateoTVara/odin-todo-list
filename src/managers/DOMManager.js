@@ -22,6 +22,12 @@ class DOMManager {
     this.cardModalDiv = document.querySelector(".card-modal > div")
     this.cardMenu = document.querySelector(".card-menu");
     this.cardDetails = document.querySelector(".card-details");
+    this.inputDueDate = document.querySelector(".card-menu #date");
+    this.saveButton = document.querySelector(".buttons button:first-child");
+    this.cancelButton = document.querySelector(".buttons button:last-child");
+    this.cardDetailsHeader = document.querySelector(".card-details-header");
+    this.h3Description = this.cardDetailsHeader.querySelector("h3:first-child");
+    this.h3DueDate = this.cardDetailsHeader.querySelector("h3:last-child");
   }
 }
 

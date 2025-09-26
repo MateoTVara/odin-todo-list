@@ -46,7 +46,8 @@ class PersistenceManager {
         cards: listInstance.cards.map(cardInstance => ({
           id: cardInstance.id,
           description: cardInstance.description,
-          locked: cardInstance.locked
+          locked: cardInstance.locked,
+          dueDate: cardInstance.dueDate
         }))
       }))
     }

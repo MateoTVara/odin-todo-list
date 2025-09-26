@@ -9,6 +9,7 @@ export class Card {
     this.id = crypto.randomUUID();
     this.description = description;
     this.locked = locked;
+    this.dueDate = null;
 
     this.cardElement = null;
     this.descriptionInput = null;

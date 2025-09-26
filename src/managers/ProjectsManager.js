@@ -22,6 +22,7 @@ class ProjectsManager {
       list.cards = listData.cards.map(cardData => {
         const card = new Card(cardData.description, cardData.locked);
         card.id = cardData.id;
+        card.dueDate = cardData.dueDate;
         return card;
       })
       return list;
