@@ -104,7 +104,6 @@ body * {
 
 .projects > * {
   border-radius: 4px 4px 12px 12px;
-  overflow: hidden;
 }
 
 .projects > .add-project {
