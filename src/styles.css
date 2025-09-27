@@ -247,6 +247,29 @@ div[data-swapy-slot] > .project-item {
   pointer-events: none;
 }
 
+.project .card-item:focus {
+  outline-style: none;
+  outline: 1px solid black;
+}
+
+.project .card-item:disabled {
+  border: none;
+  outline-style: none;
+}
+
+.project .add-card {
+  padding: 4px 8px;
+}
+
+.project .add-card:hover {
+  background-color: #1e1e1e;
+  cursor: pointer;
+}
+
+
+
+/* Card Modal */
+
 .board .card-modal {
   display: flex;
   justify-content: center;
@@ -275,6 +298,7 @@ div[data-swapy-slot] > .project-item {
   background-color: #121212;
   overflow-y: auto;
   overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .modal-content .card-menu {
@@ -328,6 +352,60 @@ div[data-swapy-slot] > .project-item {
   max-width: 100%;
 }
 
+.card-details > .checklist-container {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 6px;
+
+  margin-bottom: 16px;
+}
+
+.checklist-container input[type="text"]{
+  max-width: 100%;
+  padding: 4px 8px;
+  border: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.checklist-container input[type="text"]:focus {
+  outline: 1px solid #e0e0e0;
+}
+
+.checklist-container > progress {
+  width: 100%;
+  margin: 0px 8px;
+}
+
+.checklist-container > .checkitems-field {
+  border: none;
+  padding: 0;
+  margin: 0 0 12px 4px;
+  
+  display: flex;
+  flex-direction: inherit;
+  gap: 4px;
+}
+
+.checkitems-field > ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+.checkitems-field > ul > li {
+  display: flex;
+  flex-direction: row;
+  column-gap: 4px;
+  list-style-type: none;
+}
+
+.checklist-container > .add-check-item {
+  margin-left: 8px;
+}
+
 .modal-content .buttons {
   display: flex;
   flex-direction: row;
@@ -336,29 +414,6 @@ div[data-swapy-slot] > .project-item {
   gap: 12px;
 
   margin-left: auto;
-}
-
-.board .card-modal.none-display {
-  display: none;
-}
-
-.project .card-item:focus {
-  outline-style: none;
-  outline: 1px solid black;
-}
-
-.project .card-item:disabled {
-  border: none;
-  outline-style: none;
-}
-
-.project .add-card {
-  padding: 4px 8px;
-}
-
-.project .add-card:hover {
-  background-color: #1e1e1e;
-  cursor: pointer;
 }
 
 
@@ -416,5 +471,9 @@ div[data-swapy-slot] > .project-item {
 }
 
 .board > .project.none-display {
+  display: none;
+}
+
+.board .card-modal.none-display {
   display: none;
 }
