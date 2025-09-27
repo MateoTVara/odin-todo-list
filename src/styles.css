@@ -359,6 +359,7 @@ div[data-swapy-slot] > .project-item {
   gap: 6px;
 
   margin-bottom: 16px;
+  width: 100%;
 }
 
 .checklist-container input[type="text"]{
@@ -373,26 +374,60 @@ div[data-swapy-slot] > .project-item {
   outline: 1px solid #e0e0e0;
 }
 
-.checklist-container > progress {
+.checklist-container > .checkitems-field {
+  border: 2px solid #e0e0e0;
   width: 100%;
-  margin: 0px 8px;
+  min-width: 0;
+  padding: 5.6px 12px 10px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.checklist-container > .checkitems-field {
-  border: none;
-  padding: 0;
-  margin: 0 0 12px 4px;
-  
-  display: flex;
-  flex-direction: inherit;
-  gap: 4px;
+.checkitems-field > .checklist-title {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.checkitems-field > .checklist-title:focus {
+  outline: 2px solid #e0e0e0;
+}
+
+.checkitems-field > progress {
+  width: 100%;
+  appearance: none;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  height: 1rem;
+  background-color: #333;
+  margin-bottom: 4px;
+}
+
+.checkitems-field > progress::-webkit-progress-bar {
+  background-color: #333;
+  border-radius: 8px;
+}
+
+.checkitems-field > progress::-webkit-progress-value {
+  background-color: #4caf50;
+  border-radius: 8px;
+  transition: width 0.1s ease;
+}
+
+.checkitems-field > progress::-moz-progress-bar {
+  background-color: #4caf50;
+  border-radius: 8px;
 }
 
 .checkitems-field > ul {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 0 8px;
+  padding: 0 4px;
+  width: 100%;
 }
 
 .checkitems-field > ul > li {
@@ -400,10 +435,15 @@ div[data-swapy-slot] > .project-item {
   flex-direction: row;
   column-gap: 4px;
   list-style-type: none;
+  width: 100%;
+}
+
+.checkitems-field > ul > li > input[type="text"] {
+  flex: 1;
 }
 
 .checklist-container > .add-check-item {
-  margin-left: 8px;
+  margin-left: 16px;
 }
 
 .modal-content .buttons {

@@ -1,4 +1,4 @@
-// CardModalManager.js
+// src/managers/CardModalManager.js
 
 import { format, max, parse, parseISO } from "date-fns";
 import { domManager, projectsManager } from "../managers";
@@ -74,14 +74,15 @@ class CardModalManager {
 
 
   #renderCheckList(){
-    const checkListTitle = Helper.createElement("input", {
-      value: "New Checklist",
+    const checkListTitle = Helper.createElement("legend", {
+      text: "New Checklist",
       classes: ["checklist-title"],
-      attrs: {type: "text"},
+      attrs: {
+        type: "text",
+        contenteditable: "true"
+      },
       listeners: {
-        blur: () => {
-          if (checkListTitle.value.trim() === "") {checkListTitle.value = "New Checklist"}
-        }
+        blur: () => {Helper.onBlurDefault(checkListTitle, "New Checklist")}
       }
     });
     
@@ -96,43 +97,42 @@ class CardModalManager {
     const ul = Helper.createElement("ul", {});
     const fieldset = Helper.createElement("fieldset", {
       classes: ["checkitems-field"],
-      children: [ul]
+      children: [checkListTitle, progressBar, ul]
     });
 
     const addCheckItemDiv = Helper.createElement("button", {
       text: "Add Item",
       classes: ["add-check-item"],
-      listeners: {
-        click: () => {
-          const itemLabel = Helper.createElement("input", {
-            value: "New Item",
-            attrs: {type: "text"},
-          });
-          const itemCheckBox = Helper.createElement("input", {
-            attrs: {
-              type: "checkbox",
-              id: "new-item"
-            },
-            listeners: {change: () => {this.#onItemCheckBoxChange(ul, progressBar, itemCheckBox, itemLabel)}}
-          });
-          const itemContainer = Helper.createElement("li", {
-            children: [itemCheckBox, itemLabel]
-          });
-          ul.appendChild(itemContainer);
-          this.#updateProgressBar(ul, progressBar);
-          itemLabel.focus();
-        }
-      }
+      listeners: {click: () => {this.#renderCheckItem(ul, progressBar)}}
     });
 
     const container = Helper.createElement("div", {
       classes: ["checklist-container"],
-      children: [checkListTitle, progressBar, fieldset, addCheckItemDiv],
+      children: [fieldset, addCheckItemDiv],
     });
 
     domManager.cardDetails.appendChild(container);
 
     checkListTitle.focus();
+  }
+
+  #renderCheckItem(ul, progressBar){
+    const itemLabel = Helper.createElement("input", {
+      value: "New Item",
+      attrs: {type: "text"},
+      listeners: {blur: () => Helper.onBlurDefault(itemLabel, "New Item")}
+    });
+    const itemCheckBox = Helper.createElement("input", {
+      classes: ["check-box-item"],
+      attrs: {type: "checkbox"},
+      listeners: {change: () => {this.#onItemCheckBoxChange(ul, progressBar, itemCheckBox, itemLabel)}}
+    });
+    const itemContainer = Helper.createElement("li", {
+      children: [itemCheckBox, itemLabel]
+    });
+    ul.appendChild(itemContainer);
+    this.#updateProgressBar(ul, progressBar);
+    itemLabel.focus();
   }
 
   #markCheckItem(itemCheckBox, itemLabel){

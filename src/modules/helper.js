@@ -1,3 +1,5 @@
+// src/modules/helper.js
+
 class Helper {
   static randomColor(haveAlpha = false){
     const r = Math.floor(Math.random() * 256);
@@ -21,6 +23,22 @@ class Helper {
     Object.entries(listeners).forEach(([event, handler]) => element.addEventListener(event, handler))
     children.forEach(child => element.appendChild(child));
     return element;
+  }
+
+  static onBlurDefault(element, content) {
+    const tagName = element.tagName;
+    switch (tagName) {
+      case "INPUT": 
+        if (!element.value.trim()) {
+          element.value = content;
+        }
+        break;
+      default: 
+        if (!element.textContent.trim()) {
+          element.textContent = content;
+        }
+    }
+    element.scrollLeft = 0;
   }
 }
 
