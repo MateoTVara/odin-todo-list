@@ -440,6 +440,7 @@ div[data-swapy-slot] > .project-item {
 
 .checkitems-field > ul > li > input[type="text"] {
   flex: 1;
+  min-width: 0;
 }
 
 .checklist-container > .add-check-item {

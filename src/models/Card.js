@@ -42,16 +42,11 @@ export class Card {
   }
 
   #handleClick() {
-    console.log('Card clicked');
     domManager.cardModal.classList.remove("none-display");
 
     cardModalManager.populateModal(this.id);
 
-    // const h3 = Helper.createElement("h3", {
-    //   text: this.description
-    // })
-
-    // domManager.cardModalDiv.appendChild(h3);
+    domManager.cardModalDiv.scrollTop = 0;
   }
 
   #handleBlur() {

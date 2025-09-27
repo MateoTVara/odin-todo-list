@@ -23,7 +23,8 @@ class CardModalManager {
     });
 
     domManager.addCheckListButton.addEventListener("click", () => {
-      this.#renderCheckList();
+      this.#renderCheckList({});
+      domManager.cardModalDiv.scrollTop = domManager.cardModalDiv.scrollHeight;
     })
   }
 
@@ -38,11 +39,26 @@ class CardModalManager {
 
   #reconstructCardDetails(card) {
     domManager.h3Description.textContent = card.description;
-    if(card.dueDate) {
-      domManager.h3DueDate.textContent = ` - ${format(card.dueDate, "PPPP")}`;
-      domManager.inputDueDate.value = format(card.dueDate, "yyyy-MM-dd");
+
+    if (card.dueDate) {
+      let dateObj = typeof card.dueDate === "string" ? parseISO(card.dueDate) : card.dueDate;
+      if (!isNaN(dateObj)) {
+        domManager.h3DueDate.textContent = ` - ${format(dateObj, "PPPP")}`;
+        domManager.inputDueDate.value = format(dateObj, "yyyy-MM-dd");
+      } else {
+        domManager.h3DueDate.textContent = "";
+        domManager.inputDueDate.value = "";
+      }
     } else {
       domManager.h3DueDate.textContent = "";
+      domManager.inputDueDate.value = "";
+    }
+
+    if(Object.keys(card.checkLists).length !== 0) {
+      Object.keys(card.checkLists).forEach(checkListId => {
+        const checkList = card.checkLists[checkListId];
+        this.#renderCheckList({checkListTitleText: checkList.title}, checkList);
+      })
     }
   }
 
@@ -96,13 +112,13 @@ class CardModalManager {
 
 
 
-  #renderCheckList(){
+  #renderCheckList({checkListTitleText = "New Checklist", itemLabelText = "New Item"}, checkList = null){
     const checkListTitle = Helper.createElement("legend", {
-      text: "New Checklist",
+      text: checkListTitleText,
       classes: ["checklist-title"],
       attrs: {contenteditable: "true"},
       listeners: {
-        blur: () => {Helper.onBlurDefault(checkListTitle, "New Checklist")}
+        blur: () => {Helper.onBlurDefault(checkListTitle, checkListTitleText)}
       }
     });
     
@@ -123,7 +139,7 @@ class CardModalManager {
     const addCheckItemDiv = Helper.createElement("button", {
       text: "Add Item",
       classes: ["add-check-item"],
-      listeners: {click: () => {this.#renderCheckItem(ul, progressBar)}}
+      listeners: {click: () => {this.#renderCheckItem(ul, progressBar, itemLabelText)}}
     });
 
     const container = Helper.createElement("div", {
@@ -132,25 +148,35 @@ class CardModalManager {
     });
 
     domManager.cardDetails.appendChild(container);
+    
+    if (checkList) {
+      Object.values(checkList.items).forEach(item => {
+        this.#renderCheckItem(ul, progressBar, item.text, item.checked, false);
+      })
+    }
   }
 
-  #renderCheckItem(ul, progressBar){
+  #renderCheckItem(ul, progressBar, itemLabelText, checked = false, focus = true){
     const itemLabel = Helper.createElement("input", {
-      value: "New Item",
+      value: itemLabelText,
       attrs: {type: "text"},
-      listeners: {blur: () => Helper.onBlurDefault(itemLabel, "New Item")}
+      listeners: {blur: () => Helper.onBlurDefault(itemLabel, itemLabelText)}
     });
     const itemCheckBox = Helper.createElement("input", {
       classes: ["check-box-item"],
       attrs: {type: "checkbox"},
-      listeners: {change: () => {this.#onItemCheckBoxChange(ul, progressBar, itemCheckBox, itemLabel)}}
+      listeners: {change: () => {this.#checkItemCheckBoxChecked(ul, progressBar, itemCheckBox, itemLabel)}}
     });
     const itemContainer = Helper.createElement("li", {
       children: [itemCheckBox, itemLabel]
     });
     ul.appendChild(itemContainer);
     this.#updateProgressBar(ul, progressBar);
-    itemLabel.focus();
+
+    if(focus) {itemLabel.focus()};
+
+    if(checked) {itemCheckBox.setAttribute("checked", "")};
+    this.#checkItemCheckBoxChecked(ul, progressBar, itemCheckBox, itemLabel);
   }
 
   #markCheckItem(itemCheckBox, itemLabel){
@@ -175,7 +201,7 @@ class CardModalManager {
     progressBar.setAttribute("value", value);
   }
 
-  #onItemCheckBoxChange(ul, progressBar, itemCheckBox, itemLabel) {
+  #checkItemCheckBoxChecked(ul, progressBar, itemCheckBox, itemLabel) {
     this.#updateProgressBar(ul, progressBar);
     this.#markCheckItem(itemCheckBox, itemLabel);
     console.log(itemCheckBox.checked);

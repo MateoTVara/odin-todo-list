@@ -23,6 +23,7 @@ class ProjectsManager {
         const card = new Card(cardData.description, cardData.locked);
         card.id = cardData.id;
         card.dueDate = cardData.dueDate;
+        card.checkLists = cardData.checkLists;
         return card;
       })
       return list;
