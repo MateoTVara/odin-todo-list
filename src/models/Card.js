@@ -10,6 +10,7 @@ export class Card {
     this.description = description;
     this.locked = locked;
     this.dueDate = null;
+    this.checkLists = {};
 
     this.cardElement = null;
     this.descriptionInput = null;

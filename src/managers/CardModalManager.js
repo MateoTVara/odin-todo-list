@@ -54,6 +54,29 @@ class CardModalManager {
 
     domManager.saveButton.addEventListener("click", () => {
       card.dueDate = parseISO(domManager.inputDueDate.value);
+
+      const checkLists = {};
+      domManager.cardDetails.querySelectorAll(".checkitems-field").forEach(fieldset => {
+        const checkListId = crypto.randomUUID();
+        const checkListTitle = fieldset.querySelector(".checklist-title").textContent;
+
+        const checkListItems = {};
+        fieldset.querySelectorAll("li").forEach(li => {
+          const itemId = crypto.randomUUID();
+          const itemText = li.querySelector("input[type='text']").value;
+          const itemChecked = li.querySelector("input[type='checkbox']").checked;
+          checkListItems[itemId] = {
+            text: itemText,
+            checked: itemChecked
+          }
+        })
+        checkLists[checkListId] = {
+          title: checkListTitle,
+          items: checkListItems
+        }
+      })
+      card.checkLists = checkLists;
+
       persistenceManager.updateProjects(project);
     })
   }
@@ -77,10 +100,7 @@ class CardModalManager {
     const checkListTitle = Helper.createElement("legend", {
       text: "New Checklist",
       classes: ["checklist-title"],
-      attrs: {
-        type: "text",
-        contenteditable: "true"
-      },
+      attrs: {contenteditable: "true"},
       listeners: {
         blur: () => {Helper.onBlurDefault(checkListTitle, "New Checklist")}
       }
@@ -112,8 +132,6 @@ class CardModalManager {
     });
 
     domManager.cardDetails.appendChild(container);
-
-    checkListTitle.focus();
   }
 
   #renderCheckItem(ul, progressBar){
@@ -160,6 +178,7 @@ class CardModalManager {
   #onItemCheckBoxChange(ul, progressBar, itemCheckBox, itemLabel) {
     this.#updateProgressBar(ul, progressBar);
     this.#markCheckItem(itemCheckBox, itemLabel);
+    console.log(itemCheckBox.checked);
   }
 }
 

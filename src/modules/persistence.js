@@ -47,7 +47,8 @@ class PersistenceManager {
           id: cardInstance.id,
           description: cardInstance.description,
           locked: cardInstance.locked,
-          dueDate: cardInstance.dueDate
+          dueDate: cardInstance.dueDate,
+          checkLists: cardInstance.checkLists
         }))
       }))
     }
