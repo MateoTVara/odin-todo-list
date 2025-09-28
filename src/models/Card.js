@@ -11,6 +11,7 @@ export class Card {
     this.locked = locked;
     this.dueDate = null;
     this.checkLists = {};
+    this.priority = "";
 
     this.cardElement = null;
     this.descriptionInput = null;

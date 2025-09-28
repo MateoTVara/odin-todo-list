@@ -29,6 +29,7 @@ class DOMManager {
     this.h3Description = this.cardDetailsHeader.querySelector("h3:first-child");
     this.h3DueDate = this.cardDetailsHeader.querySelector("h3:last-child");
     this.addCheckListButton = this.cardMenu.querySelector("button");
+    this.selectPriority = this.cardMenu.querySelector("#priority");
   }
 }
 

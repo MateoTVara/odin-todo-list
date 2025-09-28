@@ -24,6 +24,7 @@ class ProjectsManager {
         card.id = cardData.id;
         card.dueDate = cardData.dueDate;
         card.checkLists = cardData.checkLists;
+        card.priority = cardData.priority;
         return card;
       })
       return list;

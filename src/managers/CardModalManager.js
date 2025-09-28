@@ -29,47 +29,7 @@ class CardModalManager {
     })
 
     domManager.saveButton.addEventListener("click", () => {
-      this.currentCard.description = domManager.h3Description.textContent;
-      const descriptionInput = document.querySelector(`.card-item[data-card-id='${this.currentCard.id}']`);
-      descriptionInput.value = this.currentCard.description;
-
-      this.currentCard.dueDate = parseISO(domManager.inputDueDate.value);
-
-      const checkLists = {};
-      domManager.cardDetails.querySelectorAll(".checkitems-field").forEach(fieldset => {
-        const checkListId = crypto.randomUUID();
-        const checkListTitle = fieldset.querySelector(".checklist-title").textContent;
-        const checkListItems = {};
-        fieldset.querySelectorAll("li").forEach(li => {
-          const itemId = crypto.randomUUID();
-          const itemText = li.querySelector("input[type='text']").value;
-          const itemChecked = li.querySelector("input[type='checkbox']").checked;
-          checkListItems[itemId] = {
-            text: itemText,
-            checked: itemChecked
-          }
-        })
-        checkLists[checkListId] = {
-          title: checkListTitle,
-          items: checkListItems
-        }
-      })
-      this.currentCard.checkLists = checkLists;
-
-      const projectId = domManager.projectDiv.dataset.projectId;
-      const currentProject = projects[projectId];
-      if (currentProject) {
-        currentProject.lists.forEach(list => {
-          list.cards.forEach(card => {
-            if (card.id === this.currentCard.id) {
-              card.description = this.currentCard.description;
-              card.dueDate = this.currentCard.dueDate;
-              card.checkLists = this.currentCard.checkLists;
-            }
-          });
-        });
-        persistenceManager.updateProjects(currentProject);
-      }
+      this.#saveChanges();
     });
 
     domManager.h3Description.addEventListener("blur", () => {
@@ -79,6 +39,53 @@ class CardModalManager {
     });
 
     domManager.h3Description.addEventListener("keydown", (e) => {if (e.key === "Enter") {e.preventDefault()}});
+  }
+
+  #saveChanges(){
+    this.currentCard.description = domManager.h3Description.textContent;
+    const descriptionInput = document.querySelector(`.card-item[data-card-id='${this.currentCard.id}']`);
+    descriptionInput.value = this.currentCard.description;
+
+    this.currentCard.dueDate = parseISO(domManager.inputDueDate.value);
+
+    const checkLists = {};
+    domManager.cardDetails.querySelectorAll(".checkitems-field").forEach(fieldset => {
+      const checkListId = crypto.randomUUID();
+      const checkListTitle = fieldset.querySelector(".checklist-title").textContent;
+      const checkListItems = {};
+      fieldset.querySelectorAll("li").forEach(li => {
+        const itemId = crypto.randomUUID();
+        const itemText = li.querySelector("input[type='text']").value;
+        const itemChecked = li.querySelector("input[type='checkbox']").checked;
+        checkListItems[itemId] = {
+          text: itemText,
+          checked: itemChecked
+        }
+      })
+      checkLists[checkListId] = {
+        title: checkListTitle,
+        items: checkListItems
+      }
+    });
+    this.currentCard.checkLists = checkLists;
+
+    this.currentCard.priority = domManager.selectPriority.value;
+
+    const projectId = domManager.projectDiv.dataset.projectId;
+    const currentProject = projects[projectId];
+    if (currentProject) {
+      currentProject.lists.forEach(list => {
+        list.cards.forEach(card => {
+          if (card.id === this.currentCard.id) {
+            card.description = this.currentCard.description;
+            card.dueDate = this.currentCard.dueDate;
+            card.checkLists = this.currentCard.checkLists;
+            card.priority = this.currentCard.priority;
+          }
+        });
+      });
+      persistenceManager.updateProjects(currentProject);
+    };
   }
 
   #closeModal(){ 
@@ -113,6 +120,12 @@ class CardModalManager {
         const checkList = this.currentCard.checkLists[checkListId];
         this.#renderCheckList({checkListTitleText: checkList.title}, checkList);
       })
+    }
+
+    if (this.currentCard.priority) {
+      domManager.selectPriority.value = this.currentCard.priority;
+    } else {
+      domManager.selectPriority.value = "";
     }
   }
 
