@@ -26,6 +26,8 @@ class DOMManager {
     this.saveButton = document.querySelector(".buttons button:first-child");
     this.cancelButton = document.querySelector(".buttons button:last-child");
     this.cardDetailsHeader = document.querySelector(".card-details-header");
+    this.cardDetailsNotes = document.querySelector(".card-notes");
+    this.cardDetailsNotesTextArea = document.querySelector(".card-notes > textarea");
     this.h3Description = this.cardDetailsHeader.querySelector("h3:first-child");
     this.h3DueDate = this.cardDetailsHeader.querySelector("h3:last-child");
     this.addCheckListButton = this.cardMenu.querySelector("button");

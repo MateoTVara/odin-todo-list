@@ -10,6 +10,7 @@ export class Card {
     this.description = description;
     this.locked = locked;
     this.dueDate = null;
+    this.notes = "";
     this.checkLists = {};
     this.priority = "";
 
@@ -47,7 +48,7 @@ export class Card {
 
     cardModalManager.currentCard = this;
 
-    cardModalManager.populateModal(this.id);
+    cardModalManager.reconstructCardDetails();
 
     domManager.cardModalDiv.scrollTop = 0;
   }

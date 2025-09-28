@@ -8,6 +8,10 @@
   font-display: swap;
 }
 
+:root {
+  --main-border-color: #e0e0e0;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -48,6 +52,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* start */
+
+html {
+  scrollbar-width: thin;
+}
 
 body {
   display: flex;
@@ -98,6 +106,7 @@ body * {
   grid-auto-rows: clamp(150px, 20%, 25%);
   justify-content: center;
   gap: 16px;
+  scrollbar-width: thin;
 }
 
 .projects * {color: black;}
@@ -110,14 +119,15 @@ body * {
   font-size: 2rem;
   text-align: center;
   align-content: center;
-  background-color: rgb(240, 240, 240);
+  background-color: #1e1e1e;
+  color: #e0e0e0;
   border-radius: 24px;
   border: none;
   cursor: pointer;
 }
 
 .projects > .add-project:hover {
-  background-color: rgb(220, 220, 220);
+  background-color: #2e2e2e;
 }
 
 div[data-swapy-slot] > .project-item {
@@ -185,6 +195,7 @@ div[data-swapy-slot] > .project-item {
   min-width: 100%;
   overflow-x: auto;
   padding: 16px;
+  scrollbar-width: thin;
 
   display: grid;
   grid-auto-flow: column;
@@ -197,6 +208,9 @@ div[data-swapy-slot] > .project-item {
   height: fit-content;
   padding: 8px;
   border: 1px solid black;
+  border-radius: 8px;
+  outline: 2px solid var(--main-border-color);
+  background-color: #1e1e1e;
 }
 
 .project .list-item {
@@ -204,6 +218,11 @@ div[data-swapy-slot] > .project-item {
   flex-direction: column;
   align-items: stretch;
   gap: 8px;
+  background-color: transparent;
+}
+
+.project .list-item * {
+  background-color: inherit;
 }
 
 .project > [data-swapy-slot] > .list-item > .list-header {
@@ -211,6 +230,12 @@ div[data-swapy-slot] > .project-item {
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 2px;
+}
+
+.list-item > [data-swapy-slot]:hover {
+  background-color: #2e2e2e;
+  cursor: pointer;
 }
 
 .project .list-header .delete-btn {
@@ -222,7 +247,7 @@ div[data-swapy-slot] > .project-item {
 }
 
 .project .add-list:hover {
-  background-color: #1e1e1e;
+  background-color: #2e2e2e;
   cursor: pointer;
 }
 
@@ -236,7 +261,7 @@ div[data-swapy-slot] > .project-item {
 }
 
 .project .title:focus {
-  outline: 1px solid black;
+  outline: 2px solid var(--main-border-color);
 }
 
 .project .card-item {
@@ -248,8 +273,7 @@ div[data-swapy-slot] > .project-item {
 }
 
 .project .card-item:focus {
-  outline-style: none;
-  outline: 1px solid black;
+  outline: 2px solid var(--main-border-color);
 }
 
 .project .card-item:disabled {
@@ -262,7 +286,7 @@ div[data-swapy-slot] > .project-item {
 }
 
 .project .add-card:hover {
-  background-color: #1e1e1e;
+  background-color: #2e2e2e;
   cursor: pointer;
 }
 
@@ -354,6 +378,25 @@ div[data-swapy-slot] > .project-item {
 
 .card-details-header > h3:first-child:focus {
   outline: 2px solid #e0e0e0;
+}
+
+.card-details > .card-notes {
+  width: 100%;
+}
+
+.card-notes > textarea {
+  width: 100%;
+  min-width: 100%;
+  max-width: 100%;
+  height: calc(1em * 4 + 8px);
+  min-height: calc(1em * 4 + 8px);
+  line-height: 1.2;
+  border: 2px solid #e0e0e0;
+  padding: 4px;
+}
+
+.card-notes > textarea:focus {
+  outline: none;
 }
 
 .card-details > .checklist-container {

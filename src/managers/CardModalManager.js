@@ -48,6 +48,8 @@ class CardModalManager {
 
     this.currentCard.dueDate = parseISO(domManager.inputDueDate.value);
 
+    this.currentCard.notes = domManager.cardDetailsNotesTextArea.value;
+
     const checkLists = {};
     domManager.cardDetails.querySelectorAll(".checkitems-field").forEach(fieldset => {
       const checkListId = crypto.randomUUID();
@@ -92,13 +94,15 @@ class CardModalManager {
     domManager.cardModal.classList.add("none-display");
     domManager.inputDueDate.value = "";
     domManager.h3DueDate.textContent = "";
-    [...domManager.cardDetails.children].forEach(
-      el => { if (el !== domManager.cardDetailsHeader) el.remove() }
-    )
+    [...domManager.cardDetails.children].forEach(el => {
+      if (el !== domManager.cardDetailsHeader && el !== domManager.cardDetailsNotes) {
+        el.remove();
+      }
+    });
     this.currentCard = null;
   }
 
-  #reconstructCardDetails() {
+  reconstructCardDetails() {
     domManager.h3Description.textContent = this.currentCard.description;
 
     if (this.currentCard.dueDate) {
@@ -115,6 +119,12 @@ class CardModalManager {
       domManager.inputDueDate.value = "";
     }
 
+    if(this.currentCard.notes) {
+      domManager.cardDetailsNotesTextArea.value = this.currentCard.notes;
+    } else {
+      domManager.cardDetailsNotesTextArea.value = "";
+    }
+
     if(Object.keys(this.currentCard.checkLists).length !== 0) {
       Object.keys(this.currentCard.checkLists).forEach(checkListId => {
         const checkList = this.currentCard.checkLists[checkListId];
@@ -127,17 +137,6 @@ class CardModalManager {
     } else {
       domManager.selectPriority.value = "";
     }
-  }
-
-  #createModalElements() {
-    const pTestId = Helper.createElement("p", {text: `test-id: ${this.currentCard.id}`});
-
-    domManager.cardDetailsHeader.insertAdjacentElement("afterend", pTestId);
-    this.#reconstructCardDetails();
-  }
-
-  populateModal() {
-    this.#createModalElements();
   }
 
 
