@@ -7,6 +7,7 @@ import { persistenceManager, projects } from "../modules/persistence";
 
 class CardModalManager {
   constructor() {
+    this.currentCard = null;
     this.initEventListeners();
   }
 
@@ -26,56 +27,18 @@ class CardModalManager {
       this.#renderCheckList({});
       domManager.cardModalDiv.scrollTop = domManager.cardModalDiv.scrollHeight;
     })
-  }
-
-  #closeModal(){ 
-    domManager.cardModal.classList.add("none-display");
-    domManager.inputDueDate.value = "";
-    domManager.h3DueDate.textContent = "";
-    [...domManager.cardDetails.children].forEach(
-      el => { if (el !== domManager.cardDetailsHeader) el.remove() }
-    )
-  }
-
-  #reconstructCardDetails(card) {
-    domManager.h3Description.textContent = card.description;
-
-    if (card.dueDate) {
-      let dateObj = typeof card.dueDate === "string" ? parseISO(card.dueDate) : card.dueDate;
-      if (!isNaN(dateObj)) {
-        domManager.h3DueDate.textContent = ` - ${format(dateObj, "PPPP")}`;
-        domManager.inputDueDate.value = format(dateObj, "yyyy-MM-dd");
-      } else {
-        domManager.h3DueDate.textContent = "";
-        domManager.inputDueDate.value = "";
-      }
-    } else {
-      domManager.h3DueDate.textContent = "";
-      domManager.inputDueDate.value = "";
-    }
-
-    if(Object.keys(card.checkLists).length !== 0) {
-      Object.keys(card.checkLists).forEach(checkListId => {
-        const checkList = card.checkLists[checkListId];
-        this.#renderCheckList({checkListTitleText: checkList.title}, checkList);
-      })
-    }
-  }
-
-  #createModalElements(card, project) {
-    const pTestId = Helper.createElement("p", {text: `test-id: ${card.id}`});
-
-    domManager.cardDetailsHeader.insertAdjacentElement("afterend", pTestId);
-    this.#reconstructCardDetails(card);
 
     domManager.saveButton.addEventListener("click", () => {
-      card.dueDate = parseISO(domManager.inputDueDate.value);
+      this.currentCard.description = domManager.h3Description.textContent;
+      const descriptionInput = document.querySelector(`.card-item[data-card-id='${this.currentCard.id}']`);
+      descriptionInput.value = this.currentCard.description;
+
+      this.currentCard.dueDate = parseISO(domManager.inputDueDate.value);
 
       const checkLists = {};
       domManager.cardDetails.querySelectorAll(".checkitems-field").forEach(fieldset => {
         const checkListId = crypto.randomUUID();
         const checkListTitle = fieldset.querySelector(".checklist-title").textContent;
-
         const checkListItems = {};
         fieldset.querySelectorAll("li").forEach(li => {
           const itemId = crypto.randomUUID();
@@ -91,21 +54,77 @@ class CardModalManager {
           items: checkListItems
         }
       })
-      card.checkLists = checkLists;
+      this.currentCard.checkLists = checkLists;
 
-      persistenceManager.updateProjects(project);
-    })
+      const projectId = domManager.projectDiv.dataset.projectId;
+      const currentProject = projects[projectId];
+      if (currentProject) {
+        currentProject.lists.forEach(list => {
+          list.cards.forEach(card => {
+            if (card.id === this.currentCard.id) {
+              card.description = this.currentCard.description;
+              card.dueDate = this.currentCard.dueDate;
+              card.checkLists = this.currentCard.checkLists;
+            }
+          });
+        });
+        persistenceManager.updateProjects(currentProject);
+      }
+    });
+
+    domManager.h3Description.addEventListener("blur", () => {
+      if (domManager.h3Description.textContent.trim() === ""){
+        domManager.h3Description.textContent = this.currentCard.description;
+      }
+    });
+
+    domManager.h3Description.addEventListener("keydown", (e) => {if (e.key === "Enter") {e.preventDefault()}});
   }
 
-  populateModal(cardId) {
-    const projectId = domManager.projectDiv.dataset.projectId;
-    const projectIntance = projectsManager.getProjectInstanceById(projects, projectId);
+  #closeModal(){ 
+    domManager.cardModal.classList.add("none-display");
+    domManager.inputDueDate.value = "";
+    domManager.h3DueDate.textContent = "";
+    [...domManager.cardDetails.children].forEach(
+      el => { if (el !== domManager.cardDetailsHeader) el.remove() }
+    )
+    this.currentCard = null;
+  }
 
-    projectIntance.lists.forEach(list =>{
-      list.cards.forEach(card => {
-        if(card.id === cardId) {this.#createModalElements(card, projectIntance)};
+  #reconstructCardDetails() {
+    domManager.h3Description.textContent = this.currentCard.description;
+
+    if (this.currentCard.dueDate) {
+      let dateObj = typeof this.currentCard.dueDate === "string" ? parseISO(this.currentCard.dueDate) : this.currentCard.dueDate;
+      if (!isNaN(dateObj)) {
+        domManager.h3DueDate.textContent = ` - ${format(dateObj, "PPPP")}`;
+        domManager.inputDueDate.value = format(dateObj, "yyyy-MM-dd");
+      } else {
+        domManager.h3DueDate.textContent = "";
+        domManager.inputDueDate.value = "";
+      }
+    } else {
+      domManager.h3DueDate.textContent = "";
+      domManager.inputDueDate.value = "";
+    }
+
+    if(Object.keys(this.currentCard.checkLists).length !== 0) {
+      Object.keys(this.currentCard.checkLists).forEach(checkListId => {
+        const checkList = this.currentCard.checkLists[checkListId];
+        this.#renderCheckList({checkListTitleText: checkList.title}, checkList);
       })
-    })
+    }
+  }
+
+  #createModalElements() {
+    const pTestId = Helper.createElement("p", {text: `test-id: ${this.currentCard.id}`});
+
+    domManager.cardDetailsHeader.insertAdjacentElement("afterend", pTestId);
+    this.#reconstructCardDetails();
+  }
+
+  populateModal() {
+    this.#createModalElements();
   }
 
 
@@ -118,7 +137,8 @@ class CardModalManager {
       classes: ["checklist-title"],
       attrs: {contenteditable: "true"},
       listeners: {
-        blur: () => {Helper.onBlurDefault(checkListTitle, checkListTitleText)}
+        blur: () => {Helper.onBlurDefault(checkListTitle, checkListTitleText)},
+        keydown: (e) => {if(e.key === "Enter") {e.preventDefault()}}
       }
     });
     

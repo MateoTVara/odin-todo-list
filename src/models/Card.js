@@ -44,6 +44,8 @@ export class Card {
   #handleClick() {
     domManager.cardModal.classList.remove("none-display");
 
+    cardModalManager.currentCard = this;
+
     cardModalManager.populateModal(this.id);
 
     domManager.cardModalDiv.scrollTop = 0;
