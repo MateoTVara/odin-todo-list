@@ -12,11 +12,11 @@ class CardModalManager {
   }
 
   initEventListeners() {
-    domManager.cardModal.addEventListener("click", (e) => {
+    domManager.cardModal.addEventListener ("click", (e) => {
       if (e.target === domManager.cardModal){this.#closeModal()};
     });
 
-    domManager.cancelButton.addEventListener("click", () => this.#closeModal());
+    domManager.deleteButton.addEventListener("click", () => this.#deleteCard());
 
     domManager.inputDueDate.addEventListener("input", () => {
       const dueDate = parseISO(domManager.inputDueDate.value);
@@ -81,6 +81,7 @@ class CardModalManager {
           if (card.id === this.currentCard.id) {
             card.description = this.currentCard.description;
             card.dueDate = this.currentCard.dueDate;
+            card.notes = this.currentCard.notes;
             card.checkLists = this.currentCard.checkLists;
             card.priority = this.currentCard.priority;
           }
@@ -88,6 +89,28 @@ class CardModalManager {
       });
       persistenceManager.updateProjects(currentProject);
     };
+
+    this.#closeModal();
+  }
+
+  #deleteCard() {
+    if(confirm("Are you sure you want to delete this card?")){
+      this.currentCard.cardElement.remove();
+
+      const projectId = domManager.projectDiv.dataset.projectId;
+      const projectInstance = projectsManager.getProjectInstanceById(projects, projectId);
+
+      projectInstance.lists.forEach(list => {
+        const cardIndex = list.cards.findIndex(card => card.id === this.currentCard.id);
+        list.cards.splice(cardIndex, 1);
+      });
+
+      persistenceManager.updateProjects(projectInstance);
+
+      this.#closeModal();
+    } else {
+
+    }
   }
 
   #closeModal(){ 

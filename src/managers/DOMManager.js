@@ -24,7 +24,7 @@ class DOMManager {
     this.cardDetails = document.querySelector(".card-details");
     this.inputDueDate = document.querySelector(".card-menu #date");
     this.saveButton = document.querySelector(".buttons button:first-child");
-    this.cancelButton = document.querySelector(".buttons button:last-child");
+    this.deleteButton = document.querySelector(".buttons button:last-child");
     this.cardDetailsHeader = document.querySelector(".card-details-header");
     this.cardDetailsNotes = document.querySelector(".card-notes");
     this.cardDetailsNotesTextArea = document.querySelector(".card-notes > textarea");
