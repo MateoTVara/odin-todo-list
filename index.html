@@ -1,0 +1,65 @@
+<!-- template.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="icon" href="31066ec74663b85fb370.ico" type="image/x-icon">
+<script defer src="main.js"></script></head>
+<body>
+  <header class="header">
+    <a href="">Projects</a>
+  </header>
+  <main class="board">
+    <div class="projects">
+      <div class="add-project">+ add project</div>
+    </div>
+    <div class="project none-display">
+      <div class="add-list">+ add list</div>
+    </div>
+    <dialog class="card-modal none-display">
+      <div class="modal-content">
+        <menu type="toolbar" class="card-menu">
+          <div>
+            <input type="date" name="date" id="date">
+            <label for="date">Due Date</label>
+          </div>
+
+          <button type="button">Checklist</button>
+
+          <div>
+            <select name="priority" id="priority" required>
+              <option value="" disabled selected hidden>Priority</option>
+              <option value="low">low</option>
+              <option value="medium">medium</option>
+              <option value="high">high</option>
+            </select>
+          </div>
+        </menu>
+        <div class="card-details">
+          <header class="card-details-header">
+            <h3 contenteditable="true"></h3>
+            <h3></h3>
+          </header>
+          <section class="card-notes">
+            <textarea placeholder="Add notes..."></textarea>
+          </section>
+        </div>
+        <div class="buttons">
+          <button>Save</button>
+          <button>Delete</button>
+        </div>
+      </div>
+    </dialog>
+  </main>
+  <dialog class="add-project-dialog none-display">
+    <form action="">
+      <label for="project-name">Project Name</label>
+      <input type="text" id="project-name" name="project-name">
+      <button type="submit">Add Project</button>
+    </form>
+  </dialog>
+</body>
+</html>
