@@ -5,8 +5,9 @@ This is a Todo List web application built as part of [The Odin Project](https://
 ## Features
 
 - **Projects & Lists:** Organize your tasks into projects, each with multiple lists.
-- **Cards:** Add, edit, and manage tasks (cards) within lists.
+- **Cards:** Add, edit, delete, and manage tasks (cards) within lists.
 - **Card Details:** Each card supports a description, due date, notes, priority, and checklists.
+- **Checklists:** Add, edit, and delete checklists within cards.
 - **Drag & Drop:** Reorder projects with intuitive drag-and-drop.
 - **Persistence:** All data is saved in your browser's localStorage, so your tasks are always there when you return.
 - **Responsive UI:** Clean, modern interface that works on desktop and mobile.
@@ -42,7 +43,3 @@ This is a Todo List web application built as part of [The Odin Project](https://
 
 - Built for [The Odin Project](https://www.theodinproject.com/) curriculum.
 - [Kanban](https://icons8.com/icon/fbyWnEcsCVhd/kanban) icon by [Icons8](https://icons8.com)
-
----
-
-Happy coding!
