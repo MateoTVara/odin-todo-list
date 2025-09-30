@@ -407,6 +407,20 @@ div[data-swapy-slot] > .project-item {
 
   margin-bottom: 16px;
   width: 100%;
+  position: relative;
+}
+
+.checklist-container > button:first-child {
+  background-image: url(./assets/icons/delete-white.svg);
+  background-size: 16px 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  border-radius: 50%;
+  top: 3px;
+  right: -10px;
 }
 
 .checklist-container input[type="text"]{

@@ -167,6 +167,14 @@ class CardModalManager {
 
 
   #renderCheckList({checkListTitleText = "New Checklist", itemLabelText = "New Item"}, checkList = null){
+    const deleteChecklist = Helper.createElement("button", {
+      listeners: {
+        click: () => {
+          container.remove()
+        }
+      }
+    })
+
     const checkListTitle = Helper.createElement("legend", {
       text: checkListTitleText,
       classes: ["checklist-title"],
@@ -199,7 +207,7 @@ class CardModalManager {
 
     const container = Helper.createElement("div", {
       classes: ["checklist-container"],
-      children: [fieldset, addCheckItemDiv],
+      children: [deleteChecklist, fieldset, addCheckItemDiv],
     });
 
     domManager.cardDetails.appendChild(container);
